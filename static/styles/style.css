@@ -109,3 +109,13 @@ main {
 .filelist li.has-highlight {
 	background-color: orange;
 }
+
+.tab {
+	padding: 0.5em;
+    display: inline-block;
+    border-top-style: solid;
+    border-top-width: 3px;
+    border-bottom-width: 0;
+    background-color: lightgray;
+    border-top-color: lightseagreen;
+}
