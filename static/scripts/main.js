@@ -125,6 +125,7 @@ function populateFileList(el, path) {
 					li.dataset.name = datum.name;
 					li.dataset.size = datum.size;
 					li.textContent = datum.name;
+					li.tabIndex = 1;
 					li.data = datum;
 					el.appendChild(li);
 				});
@@ -214,6 +215,10 @@ var openFileDialog = (function () {
 		rejecter = undefined;
 	}
 
+	function onkeydown(e) {
+		if (event.keyCode === 13) ondblclick(e);
+	}
+
 	openFileDialog.el = openFileDialog.el || document.querySelector('#file-open-widget');
 	openFileDialog.currentPathEl = openFileDialog.currentPathEl || openFileDialog.el.querySelector('input[name="current-path"]');
 	openFileDialog.filelistLeft = openFileDialog.filelistLeft || openFileDialog.el.querySelector('.filelist:first-child');
@@ -223,6 +228,10 @@ var openFileDialog = (function () {
 
 	openFileDialog.filelistLeft.addEventListener('click', highlight);
 	openFileDialog.filelistRight.addEventListener('click', highlight);
+
+	openFileDialog.filelistLeft.addEventListener('keydown', onkeydown);
+	openFileDialog.filelistRight.addEventListener('keydown', onkeydown);
+
 	openFileDialog.filelistLeft.addEventListener('dblclick', ondblclick);
 	openFileDialog.filelistRight.addEventListener('dblclick', ondblclick);
 	openFileDialog.openButton.addEventListener('click', function () {
