@@ -1,0 +1,32 @@
+@font-face {
+	font-family: FontAwesome;
+	font-weight: normal;
+	font-style: normal;
+	src: url("/icons/fontawesome.woff2");
+}
+
+@font-face {
+	font-family: Mfizz;
+	src: url("/icons/mfixx.woff2");
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: Devicons;
+	src: url("/icons/devopicons.woff2");
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: file-icons;
+	src: url("/icons/file-icons.woff2");
+	font-weight: normal;
+	font-style: normal;
+}
+
+ .filelist li[data-mime="directory"]:before {
+	font-family: "FontAwesome";
+	content: "\f07b";
+ }

@@ -1,0 +1,100 @@
+* {
+	box-sizing: border-box;
+}
+
+body, html {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	overflow: hidden;
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+}
+
+main {
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+}
+
+#container {
+	flex-grow: 1;
+}
+
+#sidebar {
+	width: 200px;
+	max-width: 50%;
+	display: flex;
+	flex-direction: column;
+}
+
+#file-open-widget {
+	min-width: 300px;
+	width: 66%;
+	max-width: 800px;
+	height: 500px;
+	max-height: calc(100% - 1em);
+	background: white;
+	box-shadow: 0 0 3em -0.5em black;
+	position: absolute;
+	left: 50%;
+	top: 1em;
+	transform: translateX(-50%);
+	transition: transform 0.5s ease;
+	display: flex;
+	padding: 0.5em;
+	flex-direction: column;
+}
+
+#file-open-widget.closed {
+	transform: translateX(-50%) translateY(-100%) translateY(-3em);
+}
+
+#file-open-widget input[name="current-path"] {
+	margin-bottom: 0.5em;
+}
+
+#file-open-widget .buttons {
+	text-align: right;
+}
+
+#file-open-widget .file-selectors {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: row;
+	margin-bottom: 0.5em;
+}
+
+#file-open-widget .file-selectors .filelist:first-child {
+	margin-right: 0.5em;
+}
+
+.filelist {
+	margin: 0;
+	border: 1px solid grey;
+	flex-grow: 1;
+	overflow: auto;
+	list-style: none;
+	padding: 0;
+}
+
+.filelist li {
+	position: relative;
+	cursor: pointer;
+}
+
+.filelist li:before {
+	content: '';
+	display: inline-block;
+	width: 1.5em;
+	padding-right: 0.5em;
+	text-align: right;
+	user-select: none;
+}
+
+.filelist li.has-highlight {
+	background-color: orange;
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<link rel="stylesheet" href="styles/style.css"></link>
+	<link rel="stylesheet" href="styles/icons.css"></link>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+	<title>Editor</title>
+</head>
+<body>
+<div id="tools">Tools</div>
+<div id="tabs">Tabs</div>
+<main>
+	<div id="sidebar">
+		<ul class="filelist" id="currently-open-files"></ul>
+		<ul class="filelist" id="directory"></ul>
+	</div>
+	<div id="container"></div>
+</main>
+
+<div id="file-open-widget" class="closed">
+	<input type="text" name="current-path"></input>
+	<div class="file-selectors">
+		<ul class="filelist"></ul>
+		<ul class="filelist"></ul>
+	</div>
+	<div class="buttons">
+		<button id="open">Open</button>
+	</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pouchdb/6.2.0/pouchdb.min.js" integrity="sha256-i8MOihLhPV+X3HkutlDRMKTrf26Wgao6r/O84JB+jlo=" crossorigin="anonymous" defer></script>
+<script src="vs/loader.js" defer></script>
+<script src="scripts/main.js" defer></script>
+</body>
+</html>

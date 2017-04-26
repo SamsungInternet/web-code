@@ -1,0 +1,21 @@
+{
+  "name": "web-code",
+  "version": "1.0.0",
+  "description": "Text editor for the web",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "file-icons": "git+https://github.com/file-icons/atom.git",
+    "mime": "^1.3.4",
+    "monaco": "^1.201704190613.0",
+    "monaco-editor": "^0.8.3",
+    "ws": "^2.3.1"
+  }
+}
