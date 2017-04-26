@@ -8,14 +8,18 @@
 	<title>Editor</title>
 </head>
 <body>
-<div id="tools">Tools</div>
-<div id="tabs">Tabs</div>
+<div id="tools">
+	<button aria-label="Open File" data-action="open-file"></button>
+</div>
 <main>
 	<div id="sidebar">
 		<ul class="filelist" id="currently-open-files"></ul>
 		<ul class="filelist" id="directory"></ul>
 	</div>
-	<div id="container"></div>
+	<div id="editor">
+		<div id="tabs">Tabs</div>
+		<div id="container"></div>
+	</div>
 </main>
 
 <div id="file-open-widget" class="closed">
@@ -25,7 +29,8 @@
 		<ul class="filelist"></ul>
 	</div>
 	<div class="buttons">
-		<button id="open">Open</button>
+		<button id="file-open-cancel">Cancel</button>
+		<button id="file-open-open">Open</button>
 	</div>
 </div>
 

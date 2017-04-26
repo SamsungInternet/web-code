@@ -26,6 +26,17 @@
 	font-style: normal;
 }
 
+button[data-action="open-file"]:before {
+	font-family: "FontAwesome";
+	content: "\f0c7";
+	font-size: 2em;
+}
+
+ .filelist li:before {
+	font-family: "FontAwesome";
+	content: "\f15b";
+ }
+
  .filelist li[data-mime="directory"]:before {
 	font-family: "FontAwesome";
 	content: "\f07b";

@@ -2,17 +2,21 @@
 /* eslint no-var: 0, no-console: 0 */
 'use strict';
 
+var editor;
+
 require.config({ paths: { 'vs': 'vs' }});
 require(['vs/editor/editor.main'], function() {
-	var editor = monaco.editor.create(document.getElementById('container'));
-	window.editor = editor;
-	console.log(editor);
+	editor = monaco.editor.create(document.getElementById('container'));
 });
 
 var ws = new WebSocket((location.hostname === 'localhost' ? 'ws://' : 'wss://') + location.host);
 ws.binaryType = 'arraybuffer';
 
 var promises = new Map();
+
+var els = {
+	filelist: document.getElementById('directory')
+};
 
 ws.addEventListener('message', function m(e) {
 	if (typeof e.data === 'string') {
@@ -34,7 +38,7 @@ ws.addEventListener('message', function m(e) {
 function remoteCmd(cmd, data) {
 	var id = performance.now() + '_' + Math.random();
 	ws.send(JSON.stringify([
-		'STAT',
+		cmd,
 		id,
 		data
 	]));
@@ -52,28 +56,39 @@ ws.addEventListener('open', function firstOpen() {
 var db = new PouchDB('web-code', {});
 
 function init() {
-	db.get('INIT_STATE').then(function (doc) {
-		if (doc.previous_path) {
-			openPath(doc.previous_path);
-		}
-		promptForOpen();
-	})
-	.catch(function (err) {
-		promptForOpen();
-		console.log(err);
-	});
+	db.get('INIT_STATE')
+		.then(function (doc) {
+			if (doc.previous_path) {
+				openPath(doc.previous_path);
+			}
+			promptForOpen();
+		})
+		.catch(function (err) {
+			promptForOpen();
+			console.log(err);
+		});
+
+	document.querySelector('button[data-action="open-file"]').addEventListener('click', promptForOpen);
 }
 
-function openPath(path) {
-	remoteCmd('STAT', path).then(function (data) {
-		console.log(data);
-	});
+function openPath(data) {
+	if (data.isDir) {
+		populateFileList(els.filelist, data.path);
+	}
+	if (data.isFile) {
+		openFile(data.path);
+	}
 }
 
 function promptForOpen() {
-	openFileDialog('/').then(function () {
+	openFileDialog('/').then(openPath);
+}
 
-	});
+function openFile(path) {
+	return remoteCmd('OPEN', path)
+		.then(function (data) {
+			editor.setValue(data);
+		})
 }
 
 function populateFileList(el, path) {
@@ -116,17 +131,33 @@ function populateFileList(el, path) {
 		});
 }
 
-function openFileDialog(path) {
-
-	openFileDialog.el = openFileDialog.el || document.querySelector('#file-open-widget');
-	openFileDialog.currentPathEl = openFileDialog.currentPathEl || openFileDialog.el.querySelector('input[name="current-path"]');
-	openFileDialog.filelistLeft = openFileDialog.filelistLeft || openFileDialog.el.querySelector('.filelist:first-child');
-	openFileDialog.filelistRight = openFileDialog.filelistRight || openFileDialog.el.querySelector('.filelist:not(:first-child)');
-	openFileDialog.openButton = openFileDialog.openButton || openFileDialog.el.querySelector('#open');
+var openFileDialog = (function () {
 
 	var highlightedEl;
 	var currentPath;
 	var resolver;
+	var rejecter;
+
+	function openFileDialog(path) {
+
+		return new Promise(function (resolve, reject) {
+			if (openFileDialog.open === undefined) openFileDialog.open = false;
+			if (openFileDialog.open === true) {
+				throw Error('Dialog already open for another task.');
+			}
+			path = path || '/';
+			currentPath = path;
+			openFileDialog.el.classList.remove('closed');
+			resolver = resolve;
+			rejecter = reject;
+
+			populateFileList(openFileDialog.filelistLeft, path)
+				.catch(function (e) {
+					console.log(e);
+					return populateFileList(openFileDialog.filelistLeft, '/')
+				});
+		});
+	}
 
 	function highlight(e) {
 		if (e.target.tagName === 'LI') {
@@ -166,37 +197,40 @@ function openFileDialog(path) {
 	function ondblclick(e) {
 		highlight(e);
 		if (e.target.data && e.target.data.isDir) return;
-		open(e.target.data.path);
+		open(e.target.data);
 	}
 
 	function open(data) {
-		if (!data) data = currentPath;
-		resolver = undefined;
+		openFileDialog.el.classList.add('closed');
 		resolver(data);
+		resolver = undefined;
+		rejecter = undefined;
 	}
 
-	if (!openFileDialog.hasEventListeners) {
-		openFileDialog.hasEventListeners = true;
-		openFileDialog.filelistLeft.addEventListener('click', highlight);
-		openFileDialog.filelistRight.addEventListener('click', highlight);
-		openFileDialog.filelistLeft.addEventListener('dblclick', ondblclick);
-		openFileDialog.filelistRight.addEventListener('dblclick', ondblclick);
-		openFileDialog.openButton.addEventListener('click', open);
+	function cancel() {
+		openFileDialog.el.classList.add('closed');
+		rejecter('User canceled');
+		resolver = undefined;
+		rejecter = undefined;
 	}
 
-	return new Promise(function (resolve) {
-		if (openFileDialog.open === undefined) openFileDialog.open = false;
-		if (openFileDialog.open === true) {
-			throw Error('Dialog already open for another task.');
-		}
-		path = path || '/';
-		openFileDialog.el.classList.remove('closed');
-		resolver = resolve;
+	openFileDialog.el = openFileDialog.el || document.querySelector('#file-open-widget');
+	openFileDialog.currentPathEl = openFileDialog.currentPathEl || openFileDialog.el.querySelector('input[name="current-path"]');
+	openFileDialog.filelistLeft = openFileDialog.filelistLeft || openFileDialog.el.querySelector('.filelist:first-child');
+	openFileDialog.filelistRight = openFileDialog.filelistRight || openFileDialog.el.querySelector('.filelist:not(:first-child)');
+	openFileDialog.openButton = openFileDialog.openButton || openFileDialog.el.querySelector('#file-open-open');
+	openFileDialog.cancelButton = openFileDialog.cancelButton || openFileDialog.el.querySelector('#file-open-cancel');
 
-		populateFileList(openFileDialog.filelistLeft, path)
-		.catch(function (e) {
-			console.log(e);
-			return populateFileList(openFileDialog.filelistLeft, '/')
-		});
+	openFileDialog.filelistLeft.addEventListener('click', highlight);
+	openFileDialog.filelistRight.addEventListener('click', highlight);
+	openFileDialog.filelistLeft.addEventListener('dblclick', ondblclick);
+	openFileDialog.filelistRight.addEventListener('dblclick', ondblclick);
+	openFileDialog.openButton.addEventListener('click', function () {
+		open(highlightedEl.data);
 	});
-}
+	openFileDialog.cancelButton.addEventListener('click', function () {
+		cancel();
+	});
+
+	return openFileDialog;
+}());

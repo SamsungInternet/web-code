@@ -24,6 +24,12 @@ main {
 	flex-grow: 1;
 }
 
+#editor {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+}
+
 #sidebar {
 	width: 200px;
 	max-width: 50%;
@@ -61,6 +67,10 @@ main {
 	text-align: right;
 }
 
+#tools {
+	padding: 0 0.5em;
+}
+
 #file-open-widget .file-selectors {
 	flex-grow: 1;
 	display: flex;
@@ -83,6 +93,7 @@ main {
 
 .filelist li {
 	position: relative;
+	white-space: nowrap;
 	cursor: pointer;
 }
 
