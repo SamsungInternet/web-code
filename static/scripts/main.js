@@ -2,12 +2,23 @@
 /* eslint no-var: 0, no-console: 0 */
 'use strict';
 
-var editor;
+require.config({ paths: { 'vs': 'vs' } });
 
-require.config({ paths: { 'vs': 'vs' }});
-require(['vs/editor/editor.main'], function() {
-	editor = monaco.editor.create(document.getElementById('container'));
+var monacoPromise = new Promise(function (resolve) {
+	require(['vs/editor/editor.main'], resolve);
 });
+
+function getMonacoLanguageFromMimes(mime) {
+	return (monaco.languages.getLanguages().filter(function (languageObj) {
+		return languageObj.mimetypes && languageObj.mimetypes.includes(mime);
+	})[0] || {})['id'];
+}
+
+function getMonacoLanguageFromExtensions(extension) {
+	return (monaco.languages.getLanguages().filter(function (languageObj) {
+		return languageObj.extensions && languageObj.extensions.includes(extension);
+	})[0] || {})['id'];
+}
 
 var ws = new WebSocket((location.hostname === 'localhost' ? 'ws://' : 'wss://') + location.host);
 ws.binaryType = 'arraybuffer';
@@ -60,7 +71,7 @@ var db = new PouchDB('web-code', {});
 
 function init() {
 
-	return db.get('INIT_STATE')
+	db.get('INIT_STATE')
 		.then(function (doc) {
 			if (doc.previous_path) {
 				return openPath(doc.previous_path);
@@ -72,7 +83,6 @@ function init() {
 			promptForOpen();
 			console.log(err);
 		});
-
 }
 
 function openPath(data) {
@@ -108,8 +118,12 @@ function openPath(data) {
 
 function openFile(data) {
 	return remoteCmd('OPEN', data.path)
-		.then(function (data) {
-			editor.setValue(data);
+		.then(function (fileContents) {
+			var language = getMonacoLanguageFromMimes(data.mime) || getMonacoLanguageFromExtensions(data.extension);
+			monaco.editor.create(document.getElementById('container'), {
+				value: fileContents,
+				language: language
+			});
 		})
 }
 
