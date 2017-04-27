@@ -28,6 +28,12 @@
 
 button[data-action="open-file"]:before {
 	font-family: "FontAwesome";
+	content: "\f07b";
+	font-size: 2em;
+}
+
+button[data-action="save-file"]:before {
+	font-family: "FontAwesome";
 	content: "\f0c7";
 	font-size: 2em;
 }
@@ -41,3 +47,38 @@ button[data-action="open-file"]:before {
 	font-family: "FontAwesome";
 	content: "\f07b";
  }
+
+ .filelist li[data-mime="application/pdf"]:before {
+	font-family: "FontAwesome";
+	content: "\f1c1";
+ }
+
+ .filelist li[data-mime^="image/"]:before {
+	font-family: "FontAwesome";
+	content: "\f1c5";
+ }
+
+.filelist li[data-mime="application/javascript"]:before {
+	font-family: MFizz;
+	content: "\f129";
+}
+
+.filelist li[data-name="package.json"]:before {
+	font-family: "file-icons";
+	content: "\E91C";
+}
+
+.filelist li[data-mime="text/x-markdown"]:before {
+	font-family: "Devicons";
+	content: "\E63E";
+}
+
+.filelist li[data-mime="text/html"]:before {
+	font-family: "FontAwesome";
+	content: "\f13b";
+}
+
+.filelist li[data-mime="text/css"]:before {
+	font-family: "FontAwesome";
+	content: "\f13c";
+}

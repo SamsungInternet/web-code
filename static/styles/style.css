@@ -91,6 +91,11 @@ main {
 	padding: 0;
 }
 
+.filelist .filelist {
+	padding-left: 0.5em;
+	border: none;
+}
+
 .filelist li {
 	position: relative;
 	white-space: nowrap;
