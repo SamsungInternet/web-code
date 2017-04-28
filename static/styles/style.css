@@ -131,7 +131,7 @@ main {
 	cursor: pointer;
 }
 
-.filelist li:before {
+.has-icon:before {
 	content: '';
 	display: inline-block;
 	width: 1.5em;
@@ -163,6 +163,10 @@ main {
 	transition: transform 0.5s ease;
 	cursor: pointer;
 	white-space: nowrap;
+}
+
+.tab.has-icon {
+	padding: 0.5em 0.5em 0.5em 0;
 }
 
 .tab:hover {

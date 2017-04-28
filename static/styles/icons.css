@@ -38,47 +38,47 @@ button[data-action="save-file"]:before {
 	font-size: 2em;
 }
 
- .filelist li:before {
+ .has-icon:before {
 	font-family: "FontAwesome";
 	content: "\f15b";
  }
 
- .filelist li[data-mime="directory"]:before {
+ .has-icon[data-mime="directory"]:before {
 	font-family: "FontAwesome";
 	content: "\f07b";
  }
 
- .filelist li[data-mime="application/pdf"]:before {
+ .has-icon[data-mime="application/pdf"]:before {
 	font-family: "FontAwesome";
 	content: "\f1c1";
  }
 
- .filelist li[data-mime^="image/"]:before {
+ .has-icon[data-mime^="image/"]:before {
 	font-family: "FontAwesome";
 	content: "\f1c5";
  }
 
-.filelist li[data-mime="application/javascript"]:before {
+.has-icon[data-mime="application/javascript"]:before {
 	font-family: MFizz;
 	content: "\f129";
 }
 
-.filelist li[data-name="package.json"]:before {
+.has-icon[data-name="package.json"]:before {
 	font-family: "file-icons";
 	content: "\E91C";
 }
 
-.filelist li[data-mime="text/x-markdown"]:before {
+.has-icon[data-mime="text/x-markdown"]:before {
 	font-family: "Devicons";
 	content: "\E63E";
 }
 
-.filelist li[data-mime="text/html"]:before {
+.has-icon[data-mime="text/html"]:before {
 	font-family: "FontAwesome";
 	content: "\f13b";
 }
 
-.filelist li[data-mime="text/css"]:before {
+.has-icon[data-mime="text/css"]:before {
 	font-family: "FontAwesome";
 	content: "\f13c";
 }

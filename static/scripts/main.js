@@ -217,6 +217,7 @@ function renderFileList(el, data, options) {
 			}
 		}).map(function (datum) {
 			var li = document.createElement('li');
+			li.classList.add('has-icon');
 			li.dataset.mime = datum.mime;
 			li.dataset.name = datum.name;
 			li.dataset.size = datum.size;
@@ -389,6 +390,7 @@ var tabController = (function setUpTabs() {
 		this.data = data;
 		this.el = document.createElement('span');
 		this.el.classList.add('tab');
+		this.el.classList.add('has-icon');
 		this.el.dataset.mime = data.mime;
 		this.el.dataset.name = data.name;
 		this.el.dataset.size = data.size;
