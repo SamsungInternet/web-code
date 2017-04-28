@@ -166,12 +166,13 @@ function openFile(data) {
 					value: fileContents,
 					language: language
 				});
+				addKeyBindings(newTab.editor);
 			});
 	}
 }
 
 function promptForOpen() {
-	openFileDialog('/').then(openPath);
+	openFileDialog(currentlyOpenedPath, '/').then(openPath);
 }
 
 function renderFileList(el, data, options) {
@@ -475,3 +476,8 @@ var tabController = (function setUpTabs() {
 	directoryEl.addEventListener('keydown', onkeydown);
 
 }());
+
+function addKeyBindings(editor) {
+	editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, saveOpenTab);
+	editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_O, promptForOpen);
+}
