@@ -29,9 +29,6 @@ var els = {
 	filelist: document.getElementById('directory')
 };
 
-var currentlyOpenFilesArr = [];
-var directoryStructure = [];
-
 ws.addEventListener('message', function m(e) {
 	if (typeof e.data === 'string') {
 		var result = JSON.parse(e.data);
@@ -89,9 +86,6 @@ function openPath(data) {
 	if (data.isDir) {
 		populateFileList(els.filelist, data.path, {
 			hideDotFiles: true
-		})
-		.then(function (data) {
-			currentlyOpenFilesArr = data;
 		});
 
 		/* update last open folder in db */
@@ -117,14 +111,23 @@ function openPath(data) {
 }
 
 function openFile(data) {
-	return remoteCmd('OPEN', data.path)
-		.then(function (fileContents) {
-			var language = getMonacoLanguageFromMimes(data.mime) || getMonacoLanguageFromExtensions(data.extension);
-			monaco.editor.create(document.getElementById('container'), {
-				value: fileContents,
-				language: language
+	if (tabController.hasTab(data)) {
+		tabController.focusTab(data);
+	} else {
+		var newTab = tabController.newTab(data);
+
+		return Promise.all([remoteCmd('OPEN', data.path), monacoPromise])
+			.then(function (arr) {
+				return arr[0];
+			})
+			.then(function (fileContents) {
+				var language = getMonacoLanguageFromMimes(data.mime) || getMonacoLanguageFromExtensions(data.extension);
+				newTab.editor = monaco.editor.create(newTab.contentEl, {
+					value: fileContents,
+					language: language
+				});
 			});
-		})
+	}
 }
 
 function promptForOpen() {
@@ -312,6 +315,74 @@ var openFileDialog = (function () {
 	document.querySelector('button[data-action="open-file"]').addEventListener('click', promptForOpen);
 }());
 
+var tabController = (function setUpTabs() {
+	var currentlyOpenFilesEl = document.querySelector('#currently-open-files');
+	var containerEl = document.getElementById('container');
+	var tabsEl = document.querySelector('#tabs');
+
+	function Tab(data) {
+		this.data = data;
+		this.el = document.createElement('span');
+		this.el.classList.add('tab');
+		this.el.dataset.mime = data.mime;
+		this.el.dataset.name = data.name;
+		this.el.dataset.size = data.size;
+		this.el.textContent = data.name;
+		this.el.tabIndex = 1;
+		tabsEl.appendChild(this.el);
+
+		this.el.webCodeTab = this;
+
+		this.contentEl = document.createElement('div');
+		this.contentEl.classList.add('tab-content');
+		containerEl.appendChild(this.contentEl);
+	}
+
+	Tab.prototype.destroy = function () {
+		this.el.parentNode.removeChild(this.el);
+		this.contentEl.parentNode.removeChild(this.contentEl);
+	}
+
+	function TabController() {
+		this.currentlyOpenFilesMap = new Map();
+	}
+
+	TabController.prototype.hasTab = function (data) {
+		return this.currentlyOpenFilesMap.has(data);
+	}
+
+	TabController.prototype.newTab = function (data) {
+		var tab = new Tab(data);
+		this.currentlyOpenFilesMap.set(data, tab);
+		renderFileList(currentlyOpenFilesEl, { children: Array.from(this.currentlyOpenFilesMap.keys()) });
+		this.focusTab(tab);
+		return tab;
+	}
+
+	TabController.prototype.focusTab = function (data) {
+		var focusTab = data.constructor === Tab ? data : this.currentlyOpenFilesMap.get(data);
+		Array.from(this.currentlyOpenFilesMap.values()).forEach(function (tab) {
+			tab.contentEl.classList.toggle('has-focus', tab === focusTab);
+			tab.el.classList.toggle('has-focus', tab === focusTab);
+		});
+	}
+
+	var tabController = new TabController();
+
+	tabsEl.addEventListener('click', function (e) {
+		if (e.target.matches('.tab')) {
+			tabController.focusTab(e.target.webCodeTab.data);
+		}
+	});
+
+	currentlyOpenFilesEl.addEventListener('click', function (e) {
+		if (e.target.data) {
+			tabController.focusTab(e.target.data);
+		}
+	});
+
+	return tabController;
+}());
 
 (function setUpSideBar() {
 
@@ -330,7 +401,6 @@ var openFileDialog = (function () {
 	}
 
 	var directoryEl = document.querySelector('#directory');
-	var currentlyOpenFilesEl = document.querySelector('#currently-open-files');
 
 	function onclick(e) {
 		if (e.target.tagName === 'LI') {

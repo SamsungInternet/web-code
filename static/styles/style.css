@@ -22,6 +22,16 @@ main {
 
 #container {
 	flex-grow: 1;
+	display: flex;
+}
+
+.tab-content {
+	flex-grow: 1;
+	display: none;
+}
+
+.tab-content.has-focus {
+	display: block;
 }
 
 #editor {
@@ -115,6 +125,10 @@ main {
 	background-color: orange;
 }
 
+#tabs {
+	overflow: hidden;
+}
+
 .tab {
 	padding: 0.5em;
     display: inline-block;
@@ -123,4 +137,15 @@ main {
     border-bottom-width: 0;
     background-color: lightgray;
     border-top-color: lightseagreen;
+	transform: translateY(3px);
+	transition: transform 0.5s ease;
+	cursor: pointer;
+}
+
+.tab:hover {
+	transform: none;
+}
+
+.tab.has-focus {
+	transform: none;
 }
