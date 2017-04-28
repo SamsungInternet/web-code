@@ -367,7 +367,7 @@ var tabController = (function setUpTabs() {
 	}
 
 	TabController.prototype.getOpenTab = function () {
-		return this.focusTab;
+		return this.focusedTab;
 	}
 
 	TabController.prototype.newTab = function (data) {
@@ -380,7 +380,7 @@ var tabController = (function setUpTabs() {
 
 	TabController.prototype.focusTab = function (data) {
 		var focusTab = data.constructor === Tab ? data : this.currentlyOpenFilesMap.get(data);
-		this.focusTab = focusTab;
+		this.focusedTab = focusTab;
 		Array.from(this.currentlyOpenFilesMap.values()).forEach(function (tab) {
 			tab.contentEl.classList.toggle('has-focus', tab === focusTab);
 			tab.el.classList.toggle('has-focus', tab === focusTab);
@@ -391,7 +391,7 @@ var tabController = (function setUpTabs() {
 
 	tabsEl.addEventListener('click', function (e) {
 		if (e.target.matches('.tab')) {
-			tabController.focusTab(e.target.webCodeTab.data);
+			tabController.focusTab(e.target.webCodeTab);
 		}
 	});
 
