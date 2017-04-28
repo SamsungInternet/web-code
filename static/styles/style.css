@@ -25,6 +25,10 @@ main {
 	display: flex;
 }
 
+#directory {
+	flex-grow: 2;
+}
+
 .tab-content {
 	flex-grow: 1;
 	display: none;
@@ -78,7 +82,8 @@ main {
 }
 
 #tools {
-	padding: 0 0.5em;
+	display: flex;
+	padding: 0.5em;
 }
 
 #file-open-widget .file-selectors {
@@ -127,19 +132,23 @@ main {
 
 #tabs {
 	overflow: hidden;
+	display: flex;
+	justify-content: flex-start;
 }
 
 .tab {
 	padding: 0.5em;
     display: inline-block;
-    border-top-style: solid;
-    border-top-width: 3px;
-    border-bottom-width: 0;
+    border-style: solid;
+    border-width: 0;
     background-color: lightgray;
-    border-top-color: lightseagreen;
+    border-color: lightseagreen;
+	border-right-width: 1px;
+    border-top-width: 3px;
 	transform: translateY(3px);
 	transition: transform 0.5s ease;
 	cursor: pointer;
+	white-space: nowrap;
 }
 
 .tab:hover {

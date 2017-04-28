@@ -110,6 +110,20 @@ function openPath(data) {
 	}
 }
 
+function saveOpenTab() {
+	var tab = tabController.getOpenTab();
+	var data;
+	if (tab) {
+		data = tab.data;
+	} else {
+		return;
+	}
+	remoteCmd('SAVE', {
+		path: data.path,
+		content: tab.editor.getValue()
+	});
+}
+
 function openFile(data) {
 	if (tabController.hasTab(data)) {
 		tabController.focusTab(data);
@@ -313,6 +327,7 @@ var openFileDialog = (function () {
 
 (function setUpToolBar() {
 	document.querySelector('button[data-action="open-file"]').addEventListener('click', promptForOpen);
+	document.querySelector('button[data-action="save-file"]').addEventListener('click', saveOpenTab);
 }());
 
 var tabController = (function setUpTabs() {
@@ -351,6 +366,10 @@ var tabController = (function setUpTabs() {
 		return this.currentlyOpenFilesMap.has(data);
 	}
 
+	TabController.prototype.getOpenTab = function () {
+		return this.focusTab;
+	}
+
 	TabController.prototype.newTab = function (data) {
 		var tab = new Tab(data);
 		this.currentlyOpenFilesMap.set(data, tab);
@@ -361,6 +380,7 @@ var tabController = (function setUpTabs() {
 
 	TabController.prototype.focusTab = function (data) {
 		var focusTab = data.constructor === Tab ? data : this.currentlyOpenFilesMap.get(data);
+		this.focusTab = focusTab;
 		Array.from(this.currentlyOpenFilesMap.values()).forEach(function (tab) {
 			tab.contentEl.classList.toggle('has-focus', tab === focusTab);
 			tab.el.classList.toggle('has-focus', tab === focusTab);
