@@ -2,6 +2,8 @@
 /* eslint no-var: 0, no-console: 0 */
 'use strict';
 
+var currentlyOpenedPath = null;
+
 require.config({ paths: { 'vs': 'vs' } });
 
 var monacoPromise = new Promise(function (resolve) {
@@ -24,10 +26,6 @@ var ws = new WebSocket((location.hostname === 'localhost' ? 'ws://' : 'wss://') 
 ws.binaryType = 'arraybuffer';
 
 var promises = new Map();
-
-var els = {
-	filelist: document.getElementById('directory')
-};
 
 ws.addEventListener('message', function m(e) {
 	if (typeof e.data === 'string') {
@@ -65,6 +63,28 @@ ws.addEventListener('open', function firstOpen() {
 });
 
 var db = new PouchDB('web-code', {});
+function updateDBDoc(_id, obj) {
+
+	updateDBDoc.promise = updateDBDoc.promise || Promise.resolve();
+
+	/* update last open folder in db */
+	return updateDBDoc.promise = updateDBDoc.promise
+		.then(function () {
+			return db.get(_id)
+		})
+		.catch(function (e) {
+			if (e.status === 404) {
+				return { _id: _id }
+			}
+			throw e;
+		})
+		.then(function (doc) {
+			Object.keys(obj).forEach(function (key) {
+				doc[key] = obj[key];
+			});
+			db.put(doc);
+		});
+}
 
 function init() {
 
@@ -84,25 +104,31 @@ function init() {
 
 function openPath(data) {
 	if (data.isDir) {
-		populateFileList(els.filelist, data.path, {
+
+		if (currentlyOpenedPath !== data.path) {
+			// TODO: close all tabs
+
+			// Then open the saved tabs from last time
+			db.get('OPEN_TABS_FOR_' + data.path).then(function (tabs) {
+				tabs.open_tabs.forEach(openFile);
+			}).catch(function (e) {
+				console.log(e);
+			});
+		}
+
+		currentlyOpenedPath = data.path;
+
+		var filelist = document.getElementById('directory');
+		populateFileList(filelist, data.path, {
 			hideDotFiles: true
 		});
 
-		/* update last open folder in db */
-		db.get('INIT_STATE')
-			.catch(function (e) {
-				if (e.status === 404) {
-					return { _id: 'INIT_STATE' }
-				}
-				throw e;
-			})
-			.then(function (doc) {
-				doc.previous_path = { path: data.path, isDir: true };
-				db.put(doc);
-			})
-			.catch(function (err) {
-				console.log(err);
-			});
+		updateDBDoc('INIT_STATE', {
+			previous_path: { path: data.path, isDir: true }
+		})
+		.catch(function (err) {
+			console.log(err);
+		});
 
 	}
 	if (data.isFile) {
@@ -375,15 +401,27 @@ var tabController = (function setUpTabs() {
 		this.currentlyOpenFilesMap.set(data, tab);
 		renderFileList(currentlyOpenFilesEl, { children: Array.from(this.currentlyOpenFilesMap.keys()) });
 		this.focusTab(tab);
+		this.storeOpenTabs();
 		return tab;
 	}
 
 	TabController.prototype.focusTab = function (data) {
-		var focusTab = data.constructor === Tab ? data : this.currentlyOpenFilesMap.get(data);
-		this.focusedTab = focusTab;
+		var focusedTab = data.constructor === Tab ? data : this.currentlyOpenFilesMap.get(data);
+		this.focusedTab = focusedTab;
 		Array.from(this.currentlyOpenFilesMap.values()).forEach(function (tab) {
-			tab.contentEl.classList.toggle('has-focus', tab === focusTab);
-			tab.el.classList.toggle('has-focus', tab === focusTab);
+			tab.contentEl.classList.toggle('has-focus', tab === focusedTab);
+			tab.el.classList.toggle('has-focus', tab === focusedTab);
+		});
+		if (focusedTab.editor) focusedTab.editor.layout();
+	}
+
+	TabController.prototype.storeOpenTabs = function () {
+		if (!currentlyOpenedPath) return;
+		updateDBDoc('OPEN_TABS_FOR_' + currentlyOpenedPath, {
+			open_tabs: Array.from(this.currentlyOpenFilesMap.keys())
+		})
+		.catch(function (err) {
+			console.log(err);
 		});
 	}
 
