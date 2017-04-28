@@ -4,6 +4,9 @@
 
 var currentlyOpenedPath = null;
 
+// Map to prevent duplicate data objects for each file
+var pathToDataMap = new Map();
+
 require.config({ paths: { 'vs': 'vs' } });
 
 var monacoPromise = new Promise(function (resolve) {
@@ -151,6 +154,14 @@ function saveOpenTab() {
 }
 
 function openFile(data) {
+
+	// ensure that data objects are not duplicated.
+	if (pathToDataMap.has(data.path)) {
+		data = pathToDataMap.get(data.path);
+	} else {
+		pathToDataMap.set(data.path, data);
+	}
+
 	if (tabController.hasTab(data)) {
 		tabController.focusTab(data);
 	} else {
@@ -235,6 +246,18 @@ function populateFileList(el, path) {
 			return data;
 		})
 		.then(function (data) {
+			if (pathToDataMap.has(data.path)) {
+				data = pathToDataMap.get(data.path);
+			} else {
+				pathToDataMap.set(data.path, data);
+			}
+			data.children.forEach(function (childData, i) {
+				if (pathToDataMap.has(childData.path)) {
+					data.children[i] = pathToDataMap.get(childData.path);
+				} else {
+					pathToDataMap.set(childData.path, childData);
+				}
+			});
 			renderFileList(el, data);
 			return data;
 		});
@@ -480,4 +503,7 @@ var tabController = (function setUpTabs() {
 function addKeyBindings(editor) {
 	editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, saveOpenTab);
 	editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_O, promptForOpen);
+	editor.addCommand(monaco.KeyCode.KEY_P | monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd, function openCommandPalette() {
+		editor.trigger('anyString', 'editor.action.quickCommand');
+	});
 }
