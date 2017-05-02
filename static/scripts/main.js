@@ -1,4 +1,4 @@
-/* global require, monaco, Map, Promise, PouchDB */
+/* global require, monaco, Map, Set, Promise, PouchDB */
 /* eslint no-var: 0, no-console: 0 */
 'use strict';
 
@@ -153,14 +153,53 @@ function saveOpenTab() {
 	});
 }
 
-function openFile(data) {
+function dedup(data) {
+
+	var newChildren;
+	var oldChildren;
+
+	// That way if any of these change then the file is updated
+	var key = JSON.stringify({
+		path: data.name,
+		isDir: data.isDir,
+		isFile: data.isFile,
+		mime: data.mime
+	});
+
+	if (data.children) newChildren = data.children;
 
 	// ensure that data objects are not duplicated.
-	if (pathToDataMap.has(data.path)) {
-		data = pathToDataMap.get(data.path);
+	if (pathToDataMap.has(key)) {
+		data = pathToDataMap.get(key);
+		oldChildren = data.children;
 	} else {
-		pathToDataMap.set(data.path, data);
+		pathToDataMap.set(key, data);
 	}
+
+	if (!oldChildren && !newChildren) {
+		// do nothing, we have no children and we need to add no children
+		return data;
+	}
+
+	if (!oldChildren && newChildren) {
+		// no Set present then
+		data.children = new Set(newChildren);
+		return data;
+	}
+
+	if (oldChildren && newChildren) {
+		// Set is present so populate it
+
+		newChildren.forEach(function (childData) {
+			oldChildren.add(dedup(childData));
+		});
+		return data;
+	}
+}
+
+function openFile(data) {
+
+	data = dedup(data);
 
 	if (tabController.hasTab(data)) {
 		tabController.focusTab(data);
@@ -191,7 +230,7 @@ function renderFileList(el, data, options) {
 	options = options || {};
 
 	el.innerHTML = '';
-	data.children
+	Array.from(data.children)
 		.filter(function (datum) {
 			if (datum.name !== '..' && options.hideDotFiles !== false) {
 				return datum.name[0] !== '.';
@@ -247,18 +286,7 @@ function populateFileList(el, path) {
 			return data;
 		})
 		.then(function (data) {
-			if (pathToDataMap.has(data.path)) {
-				data = pathToDataMap.get(data.path);
-			} else {
-				pathToDataMap.set(data.path, data);
-			}
-			data.children.forEach(function (childData, i) {
-				if (pathToDataMap.has(childData.path)) {
-					data.children[i] = pathToDataMap.get(childData.path);
-				} else {
-					pathToDataMap.set(childData.path, childData);
-				}
-			});
+			data = dedup(data);
 			renderFileList(el, data);
 			return data;
 		});
@@ -477,9 +505,6 @@ var tabController = (function setUpTabs() {
 		} else {
 			populateFileList(filelistEl, data.path, {
 				hideDotFiles: true
-			})
-			.then(function (newChildlist) {
-				data.children = newChildlist;
 			});
 		}
 	}
