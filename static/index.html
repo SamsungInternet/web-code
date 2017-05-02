@@ -10,6 +10,7 @@
 </head>
 <body>
 <div id="tools">
+	<h1 id="logo">Web Code</h1>
 	<button aria-label="Open File" data-action="open-file"></button>
 	<button aria-label="Save File" data-action="save-file"></button>
 </div>
@@ -25,7 +26,10 @@
 </main>
 
 <div id="file-open-widget" class="closed">
-	<input type="text" name="current-path"></input>
+	<div class="file-open-widget_tools">
+		<button aria-label="Up Directory" data-action="up-dir"></button>
+		<input type="text" name="current-path"></input>
+	</div>
 	<div class="file-selectors">
 		<ul class="filelist"></ul>
 		<ul class="filelist"></ul>
@@ -38,6 +42,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pouchdb/6.2.0/pouchdb.min.js" integrity="sha256-i8MOihLhPV+X3HkutlDRMKTrf26Wgao6r/O84JB+jlo=" crossorigin="anonymous" defer></script>
 <script src="vs/loader.js" defer></script>
-<script src="scripts/main.js" defer></script>
+<script src="scripts/bundle.js" defer></script>
 </body>
 </html>

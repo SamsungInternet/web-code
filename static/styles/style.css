@@ -14,6 +14,9 @@ body, html {
     letter-spacing: 0.02em;
     font-size: 16px;
     color: #333;
+	--bg-head-color: #666;
+	--bg-side-color: white;
+	background-color: var(--bg-head-color);
 }
 
 body {
@@ -30,17 +33,21 @@ main {
 #container {
 	flex-grow: 1;
 	display: flex;
+	background: white;
 }
 
 #directory {
 	flex-grow: 2;
 	border-width: 0 1px 0 0;
 	padding-top: 0.5em;
+	background: var(--bg-side-color);
 }
 
 #currently-open-files {
 	padding-top: 0.5em;
 	border-width: 0 1px 1px 0px;
+	background: var(--bg-side-color);
+	border-top-right-radius: 1em;
 }
 
 .tab-content {
@@ -88,16 +95,27 @@ main {
 }
 
 #file-open-widget input[name="current-path"] {
-	margin-bottom: 0.5em;
+	flex-grow: 1;
+	font-size: 1em;
+	padding-left: 0.3em;
 }
 
 #file-open-widget .buttons {
 	text-align: right;
 }
 
+.file-open-widget_tools {
+	display: flex;
+	flex-direction: row;
+	margin-bottom: 0.5em;
+	flex-shrink: 0;
+}
+
 #tools {
 	display: flex;
 	padding: 0.5em;
+	background-color: var(--bg-head-color);
+	color: white;
 }
 
 #file-open-widget .file-selectors {
@@ -148,6 +166,14 @@ main {
 	overflow: hidden;
 	display: flex;
 	justify-content: flex-start;
+	background-color: var(--bg-head-color);
+}
+
+#logo {
+	margin: 0 0.5em 0 0;
+	padding: 0 1em 0 0;
+	font-weight: 200;
+	border-bottom: 2px solid #66a8ff;
 }
 
 .tab {

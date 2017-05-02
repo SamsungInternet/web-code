@@ -38,6 +38,12 @@ button[data-action="save-file"]:before {
 	font-size: 2em;
 }
 
+button[data-action="up-dir"]:before {
+	font-family: "FontAwesome";
+	content: "\f148";
+	font-size: 2em;
+}
+
  .has-icon:before {
 	font-family: "FontAwesome";
 	content: "\f15b";
