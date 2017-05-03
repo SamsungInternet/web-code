@@ -10,8 +10,8 @@
   "scripts": {
     "build": "rollup static/scripts/main.js --format iife --sourcemap inline --output static/scripts/bundle.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "./node_modules/.bin/nodemon --ignore static/scripts/bundle.js --exec npm run start",
-    "start": "npm run build; node index.js"
+    "watch": "./node_modules/.bin/nodemon --ignore static/scripts/bundle.js --exec \"npm run build; npm run start\"",
+    "start": "node index.js"
   },
   "author": "Ada Rose Edwards",
   "license": "MIT",
