@@ -1,6 +1,6 @@
 {
   "name": "web-code",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Text editor for the web",
   "main": "index.js",
   "preferGlobal": true,
