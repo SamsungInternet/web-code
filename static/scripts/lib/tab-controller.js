@@ -42,6 +42,10 @@ var tabController = (function setUpTabs() {
 	var containerEl = document.getElementById('container');
 	var tabsEl = document.querySelector('#tabs');
 
+	function updateOpenFileEl() {
+		renderFileList(currentlyOpenFilesEl, { children: Array.from(tabController.currentlyOpenFilesMap.keys()) });
+	}
+
 	function Tab(data) {
 		this.data = data;
 		this.el = document.createElement('a');
@@ -65,6 +69,10 @@ var tabController = (function setUpTabs() {
 		this.el.appendChild(this.closeEl);
 		this.closeEl.tabIndex = 1;
 
+		var self = this;
+		this.closeEl.addEventListener('click', function () {
+			tabController.closeTab(self);
+		});
 	}
 
 	Tab.prototype.destroy = function () {
@@ -87,7 +95,7 @@ var tabController = (function setUpTabs() {
 	TabController.prototype.newTab = function (data) {
 		var tab = new Tab(data);
 		this.currentlyOpenFilesMap.set(data, tab);
-		renderFileList(currentlyOpenFilesEl, { children: Array.from(this.currentlyOpenFilesMap.keys()) });
+		updateOpenFileEl();
 		this.focusTab(tab);
 		this.storeOpenTabs();
 		return tab;
@@ -103,6 +111,20 @@ var tabController = (function setUpTabs() {
 		if (focusedTab.editor) focusedTab.editor.layout();
 	}
 
+	TabController.prototype.closeTab = function (data) {
+		var tab = data.constructor === Tab ? data : this.currentlyOpenFilesMap.get(data);
+		var tabState = Array.from(this.currentlyOpenFilesMap.values());
+		var tabIndex = tabState.indexOf(tab);
+		var nextTab = tabState[Math.max(0, tabIndex - 1)];
+		this.currentlyOpenFilesMap.delete(tab.data);
+		tab.destroy();
+		updateOpenFileEl();
+		this.storeOpenTabs();
+		if (this.focusedTab === tab && nextTab) {
+			this.focusTab(nextTab);
+		}
+	}
+
 	TabController.prototype.storeOpenTabs = function () {
 		if (!state.currentlyOpenedPath) return;
 		updateDBDoc('OPEN_TABS_FOR_' + state.currentlyOpenedPath, {
@@ -115,15 +137,25 @@ var tabController = (function setUpTabs() {
 
 	var tabController = new TabController();
 
-	tabsEl.addEventListener('click', function (e) {
+	tabsEl.addEventListener('mouseup', function (e) {
 		if (e.target.matches('.tab')) {
-			tabController.focusTab(e.target.webCodeTab);
+			if (e.button === 0) {
+				tabController.focusTab(e.target.webCodeTab);
+			}
+			if (e.button === 2) {
+				tabController.closeTab(e.target.webCodeTab);
+			}
 		}
 	});
 
-	currentlyOpenFilesEl.addEventListener('click', function (e) {
+	currentlyOpenFilesEl.addEventListener('mouseup', function (e) {
 		if (e.target.data) {
-			tabController.focusTab(e.target.data);
+			if (e.button === 0) {
+				tabController.focusTab(e.target.data);
+			}
+			if (e.button === 1) {
+				tabController.closeTab(e.target.data);
+			}
 		}
 	});
 
