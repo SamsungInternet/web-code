@@ -6,6 +6,8 @@ import {
 	remoteCmd
 } from './ws';
 
+import fs from './fs-proxy';
+
 import state from './state';
 import { db, updateDBDoc } from './db';
 import { tabController } from './tab-controller';
@@ -81,10 +83,10 @@ function renderFileList(el, data, options) {
 
 function populateFileList(el, path, options) {
 	el.path = path;
-	return remoteCmd('STAT', path)
+	return remoteCmd('GET_PATH_INFO', path)
 		.then(function (data) {
 			if (data.isFile) {
-				return remoteCmd('STAT', data.dirName);
+				return remoteCmd('GET_PATH_INFO', data.dirName);
 			}
 			return data;
 		})
@@ -188,7 +190,7 @@ function openFile(data) {
 	} else {
 		var newTab = tabController.newTab(data);
 
-		return Promise.all([remoteCmd('OPEN', data.path), monacoPromise])
+		return Promise.all([fs.readFile(data.path, 'utf8'), monacoPromise])
 			.then(function (arr) {
 				return arr[0];
 			})

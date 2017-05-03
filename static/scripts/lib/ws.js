@@ -19,7 +19,7 @@ ws.addEventListener('message', function m(e) {
 			if (data.error) {
 				return promiseResolver[1](Error(data.error));
 			} else {
-				return promiseResolver[0](data);
+				return promiseResolver[0](data.result);
 			}
 		}
 	}

@@ -2,10 +2,10 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-import { remoteCmd } from './ws';
 import { renderFileList } from './files';
 import state from './state';
 import { updateDBDoc } from './db';
+import fs from './fs-proxy';
 
 function saveOpenTab() {
 	var tab = tabController.getOpenTab();
@@ -16,10 +16,8 @@ function saveOpenTab() {
 		return;
 	}
 	var altId = tab.editor.model.getAlternativeVersionId();
-	remoteCmd('SAVE', {
-		path: data.path,
-		content: tab.editor.getValue()
-	}).then(function () {
+	fs.writeFile(data.path, tab.editor.getValue())
+	.then(function () {
 		tab.editor.webCodeState.savedAlternativeVersionId = altId;
 		tab.editor.webCodeState.functions.checkForChanges();
 	});
