@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Text editor for the web",
   "main": "index.js",
+  "preferGlobal": true,
+  "bin": {
+    "webcode": "bin/webcode"
+  },
   "scripts": {
     "build": "rollup static/scripts/main.js --format iife --sourcemap inline --output static/scripts/bundle.js",
     "test": "echo \"Error: no test specified\" && exit 1",
