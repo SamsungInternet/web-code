@@ -9,7 +9,7 @@ import {
 import state from './state';
 import { db, updateDBDoc } from './db';
 import { tabController } from './tab-controller';
-import { monacoPromise, getMonacoLanguageFromExtensions, getMonacoLanguageFromMimes, addKeyBindings } from './monaco';
+import { monacoPromise, getMonacoLanguageFromExtensions, getMonacoLanguageFromMimes, addBindings } from './monaco';
 import openFileDialog from './open-file-dialog';
 
 // Map to prevent duplicate data objects for each file
@@ -26,6 +26,8 @@ function renderFileList(el, data, options) {
 	if (options.nestingLimit === 0) return;
 
 	el.innerHTML = '';
+	el.data = data;
+
 	var sortedData = Array.from(data.children)
 		.filter(function (datum) {
 
@@ -196,7 +198,7 @@ function openFile(data) {
 					value: fileContents,
 					language: language
 				});
-				addKeyBindings(newTab.editor);
+				addBindings(newTab.editor, newTab);
 			});
 	}
 }

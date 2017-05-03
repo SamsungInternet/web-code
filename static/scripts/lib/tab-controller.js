@@ -10,14 +10,18 @@ import { updateDBDoc } from './db';
 function saveOpenTab() {
 	var tab = tabController.getOpenTab();
 	var data;
-	if (tab) {
+	if (tab && tab.editor) {
 		data = tab.data;
 	} else {
 		return;
 	}
+	var altId = tab.editor.model.getAlternativeVersionId();
 	remoteCmd('SAVE', {
 		path: data.path,
 		content: tab.editor.getValue()
+	}).then(function () {
+		tab.editor.webCodeState.savedAlternativeVersionId = altId;
+		tab.editor.webCodeState.functions.checkForChanges();
 	});
 }
 
@@ -40,7 +44,7 @@ var tabController = (function setUpTabs() {
 
 	function Tab(data) {
 		this.data = data;
-		this.el = document.createElement('span');
+		this.el = document.createElement('a');
 		this.el.classList.add('tab');
 		this.el.classList.add('has-icon');
 		this.el.dataset.mime = data.mime;
@@ -55,6 +59,12 @@ var tabController = (function setUpTabs() {
 		this.contentEl = document.createElement('div');
 		this.contentEl.classList.add('tab-content');
 		containerEl.appendChild(this.contentEl);
+
+		this.closeEl = document.createElement('button');
+		this.closeEl.classList.add('tab_close');
+		this.el.appendChild(this.closeEl);
+		this.closeEl.tabIndex = 1;
+
 	}
 
 	Tab.prototype.destroy = function () {

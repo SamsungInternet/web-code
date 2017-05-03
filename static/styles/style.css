@@ -116,7 +116,27 @@ main {
 	padding: 0.5em;
 	background-color: var(--bg-head-color);
 	color: white;
+    align-items: center;
 }
+
+#tools button {
+	font-size: 1.5em;
+    width: 1.3em;
+    height: 1.3em;
+    padding: 0;
+    text-align: center;
+    vertical-align: middle;
+	cursor: pointer;
+	color: black;
+}
+
+#tools button:not(:hover):not(:focus) {
+    -webkit-appearance: none;
+    border: 0;
+    background: none;
+	color: #ddd;
+}
+
 
 #file-open-widget .file-selectors {
 	flex-grow: 1;
@@ -163,10 +183,12 @@ main {
 }
 
 #tabs {
-	overflow: hidden;
 	display: flex;
 	justify-content: flex-start;
+	align-content: flex-end;
 	background-color: var(--bg-head-color);
+	padding-bottom: 6px;
+	margin-bottom: -6px;
 }
 
 #logo {
@@ -189,16 +211,35 @@ main {
 	transition: transform 0.5s ease;
 	cursor: pointer;
 	white-space: nowrap;
+	outline: none;
+}
+
+.tab.has-changes {
+	border-color: orangered;
+	border-top-width: 5px;
 }
 
 .tab.has-icon {
 	padding: 0.5em 0.5em 0.5em 0;
 }
 
-.tab:hover {
+.tab:hover, .tab:focus, .tab.has-focus {
 	transform: none;
 }
 
-.tab.has-focus {
-	transform: none;
+.tab .tab_close {
+    margin-left: 0.5em;
+    width: 1.3rem;
+    height: 1.3rem;
+    padding: 0;
+    text-align: center;
+    vertical-align: middle;
+	cursor: pointer;
+}
+
+.tab .tab_close:not(:hover):not(:focus) {
+    -webkit-appearance: none;
+    border: 0;
+    background: none;
+	color: grey;
 }

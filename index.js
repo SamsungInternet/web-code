@@ -1,5 +1,4 @@
 /* eslint-env es6 */
-'use strict';
 
 const server = require('http').createServer();
 const WebSocketServer = require('ws').Server;
@@ -30,5 +29,6 @@ wss.on('connection', function connection(ws) {
 
 server.on('request', app);
 server.listen(port, function () {
-	console.log('Listening on ' + server.address().port)
+	/* eslint no-console: 0 */
+	console.log('Open up: http://127.0.0.1:' + server.address().port)
 });
