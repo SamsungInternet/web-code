@@ -27,7 +27,7 @@ npm install -g web-code
 
 * Run web-code
 ```
-web-code
+webcode
 ```
 
 # Your first PR
