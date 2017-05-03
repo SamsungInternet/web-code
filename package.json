@@ -8,7 +8,7 @@
     "webcode": "bin/webcode"
   },
   "scripts": {
-    "build": "rollup static/scripts/main.js --format iife --sourcemap inline --output static/scripts/bundle.js",
+    "build": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "./node_modules/.bin/nodemon --ignore static/scripts/bundle.js --exec \"npm run build; npm run start\"",
     "start": "node index.js"
@@ -26,8 +26,12 @@
   },
   "devDependencies": {
     "nodemon": "^1.11.0",
+    "pouchdb-browser": "^6.2.0",
     "reload": "^1.1.3",
     "rollup": "^0.41.6",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-node-builtins": "^2.1.1",
+    "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-sourcemaps": "^0.4.2"
   },
   "eslintConfig": {

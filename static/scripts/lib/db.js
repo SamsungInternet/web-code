@@ -1,7 +1,8 @@
-/* global require, Promise, PouchDB */
+/* global require, Promise */
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
+import PouchDB from 'pouchdb-browser';
 var db = new PouchDB('web-code', {});
 function updateDBDoc(_id, obj) {
 

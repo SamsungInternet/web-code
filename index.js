@@ -21,6 +21,10 @@ app.use('/icons/', express.static(__dirname + '/node_modules/file-icons/fonts', 
 	maxAge: 3600 * 1000 * 24
 }));
 
+app.use('/pouchdb/', express.static(__dirname + '/node_modules/pouchdb-browser/lib', {
+	maxAge: 3600 * 1000 * 24
+}));
+
 app.use('/api/', api);
 
 wss.on('connection', function connection(ws) {
