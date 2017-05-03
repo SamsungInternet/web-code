@@ -5,7 +5,7 @@
 import { db } from './lib/db';
 import { wsPromise } from './lib/ws';
 import { openPath, promptForOpen } from './lib/files';
-import { saveOpenTab } from './lib/tab-controller';
+import { saveOpenTab, tabController } from './lib/tab-controller';
 import { setUpSideBar } from './lib/side-bar';
 
 function init() {
@@ -30,5 +30,10 @@ wsPromise.then(init);
 	document.querySelector('button[data-action="open-file"]').addEventListener('click', promptForOpen);
 	document.querySelector('button[data-action="save-file"]').addEventListener('click', saveOpenTab);
 }());
+
+window.addEventListener('resize', function () {
+	var tab = tabController.getOpenTab();
+	if (tab) tab.editor.layout();
+});
 
 setUpSideBar();

@@ -27,15 +27,8 @@ function saveOpenTab() {
 
 function closeOpenTab() {
 	var tab = tabController.getOpenTab();
-	var data;
-	if (tab) {
-		data = tab.data;
-	} else {
-		return;
-	}
-	console.log(data);
+	if (tab) tabController.closeTab(tab);
 }
-
 
 var tabController = (function setUpTabs() {
 	var currentlyOpenFilesEl = document.querySelector('#currently-open-files');
@@ -66,6 +59,7 @@ var tabController = (function setUpTabs() {
 
 		this.closeEl = document.createElement('button');
 		this.closeEl.classList.add('tab_close');
+		this.closeEl.setAttribute('aria-label', 'Close Tab ' + data.name);
 		this.el.appendChild(this.closeEl);
 		this.closeEl.tabIndex = 1;
 
@@ -142,7 +136,7 @@ var tabController = (function setUpTabs() {
 			if (e.button === 0) {
 				tabController.focusTab(e.target.webCodeTab);
 			}
-			if (e.button === 2) {
+			if (e.button === 1) {
 				tabController.closeTab(e.target.webCodeTab);
 			}
 		}

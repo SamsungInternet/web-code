@@ -41,6 +41,11 @@ button[data-action="save-file"]:before {
 	content: "\f0c7";
 }
 
+button[data-action="new-file"]:before {
+	font-family: "FontAwesome";
+	content: "\f15c";
+}
+
 button[data-action="up-dir"]:before {
 	font-family: "FontAwesome";
 	content: "\f148";
