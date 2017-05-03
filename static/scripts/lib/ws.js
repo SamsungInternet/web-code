@@ -2,7 +2,8 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-var ws = new WebSocket((location.hostname === 'localhost' ? 'ws://' : 'wss://') + location.host);
+var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+var ws = new WebSocket((isLocal ? 'ws://' : 'wss://') + location.host);
 ws.binaryType = 'arraybuffer';
 
 var promises = new Map();
