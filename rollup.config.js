@@ -9,8 +9,7 @@ export default {
 	dest: 'static/scripts/bundle.js',
 	format: 'iife',
 	sourceMap: 'inline',
-	intro: '(function () {\nvar define = false;var global={};\n',
-	outro: '}());',
+	intro: 'var define = false;var global={};\n',
 	plugins: [
 		resolve({
 			module: true, // Default: true
