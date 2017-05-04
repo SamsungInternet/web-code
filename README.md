@@ -29,15 +29,21 @@ npm install -g web-code
 termux-fix-shebang `which web-code`
 ```
 
-
 * Run web-code
 ```
 web-code
 ```
 
+# Development
+
+1. clone this repo
+2. `npm install`
+3. `npm run build`
+4. `npm run start`
+
 # Your first PR
 
-Try adding an icon for a file format you like in: `static/styles/icons.css` only a few file formats have been mapped. To corresponding icons from the  atom file-icons.
+Try adding an icon for a file format you like in: `static/styles/icons.css` only a few file formats have been mapped. To corresponding icons from atom file-icons.
 
 # Pouch Docs
 
