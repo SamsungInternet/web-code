@@ -5,7 +5,7 @@
   "main": "index.js",
   "preferGlobal": true,
   "bin": {
-    "webcode": "bin/webcode"
+    "web-code": "bin/web-code"
   },
   "scripts": {
     "build": "rollup -c",
