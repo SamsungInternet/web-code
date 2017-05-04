@@ -1,4 +1,0 @@
-#!/bin/sh
-DIR="$(dirname $0)"
-cd "$DIR/../lib/node_modules/web-code"
-npm run start

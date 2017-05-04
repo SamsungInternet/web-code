@@ -4,11 +4,15 @@
 
 import { db } from './lib/db';
 import { wsPromise } from './lib/ws';
-import { openPath, promptForOpen } from './lib/files';
+import { openPath, promptForOpen, smartOpen } from './lib/files';
 import { saveOpenTab, tabController } from './lib/tab-controller';
 import { setUpSideBar } from './lib/side-bar';
 
-function init() {
+wsPromise.then(function init(handshakeData) {
+
+	if (handshakeData.path) {
+		return smartOpen(handshakeData.path);
+	}
 
 	db.get('INIT_STATE')
 		.then(function (doc) {
@@ -22,9 +26,7 @@ function init() {
 			promptForOpen();
 			console.log(err);
 		});
-}
-
-wsPromise.then(init);
+});
 
 (function setUpToolBar() {
 	document.querySelector('button[data-action="open-file"]').addEventListener('click', promptForOpen);

@@ -245,11 +245,25 @@ function promptForOpen() {
 	openFileDialog(state.currentlyOpenedPath || process.env.HOME || '/').then(openPath);
 }
 
+function smartOpen(path) {
+	console.log('Trying to open, path');
+	fs.stat(path)
+	.then(function (result) {
+		if (result.isDirectory()) {
+			return getPathInfo(path).then(function (pathData) {openPath(pathData)});
+		}
+		if (result.isFile()) {
+			return getPathInfo(path).then(function (pathData) {openFile(pathData)});
+		}
+	});
+}
+
 export {
 	dedup,
 	populateFileList,
 	renderFileList,
 	openFile,
 	openPath,
-	promptForOpen
+	promptForOpen,
+	smartOpen
 };

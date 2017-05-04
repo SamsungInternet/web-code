@@ -5,13 +5,13 @@
   "main": "index.js",
   "preferGlobal": true,
   "bin": {
-    "web-code": "bin/web-code"
+    "web-code": "index"
   },
   "scripts": {
     "build": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "./node_modules/.bin/nodemon --ignore static/scripts/bundle.js --exec \"npm run build; npm run start\"",
-    "start": "node index.js"
+    "start": "node ./"
   },
   "author": "Ada Rose Edwards",
   "license": "MIT",

@@ -2,15 +2,23 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
+import {smartOpen} from './files';
+
 var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 var ws = new WebSocket((isLocal ? 'ws://' : 'wss://') + location.host);
 ws.binaryType = 'arraybuffer';
 
 var promises = new Map();
 
+var handshakeResolver;
+var handshakePromise = new Promise(function (resolve) {
+	handshakeResolver = resolve;
+})
+
 ws.addEventListener('message', function m(e) {
 	if (typeof e.data === 'string') {
 		var result = JSON.parse(e.data);
+		var cmd = result[0];
 		var promiseResolver = promises.get(result[1]);
 		var data = result[2];
 		if (promiseResolver) {
@@ -21,6 +29,9 @@ ws.addEventListener('message', function m(e) {
 			} else {
 				return promiseResolver[0](data.result);
 			}
+		}
+		if (cmd === 'HANDSHAKE') {
+			handshakeResolver(data);
 		}
 	}
 });
@@ -50,6 +61,9 @@ var wsPromise = new Promise(function (resolve) {
 		process.env.HOME = result;
 		return ws;
 	});
+})
+.then(function () {
+	return handshakePromise
 });
 
 export {
