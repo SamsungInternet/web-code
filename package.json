@@ -1,6 +1,6 @@
 {
   "name": "web-code",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Text editor for DeX and the Web",
   "main": "index.js",
   "preferGlobal": true,
