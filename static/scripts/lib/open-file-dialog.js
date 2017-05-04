@@ -16,7 +16,7 @@ function openFileDialog(path) {
 		if (openFileDialog.open === true) {
 			throw Error('Dialog already open for another task.');
 		}
-		path = path || '/';
+		path = path || process.env.HOME || '/';
 		currentPath = path;
 		openFileDialog.el.classList.remove('closed');
 		resolver = resolve;
@@ -26,12 +26,12 @@ function openFileDialog(path) {
 		populateFileList(openFileDialog.filelistLeft, path, {
 			nested: false
 		})
-			.catch(function (e) {
-				console.log(e);
-				return populateFileList(openFileDialog.filelistLeft, '/', {
-			nested: false
-		})
-			});
+		.catch(function (e) {
+			console.log(e);
+			return populateFileList(openFileDialog.filelistLeft, process.env.HOME || '/', {
+				nested: false
+			})
+		});
 	});
 }
 

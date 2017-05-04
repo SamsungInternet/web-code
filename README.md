@@ -10,7 +10,6 @@ In a Terminal (or Termux for Android)
 
 ```
 apt get install nodejs
-
 ```
 
 * Update npm
@@ -25,9 +24,15 @@ npm install -g npm
 npm install -g web-code
 ```
 
+* (DeX/Termux only) Fix Shebang
+```
+termux-fix-shebang `which web-code`
+```
+
+
 * Run web-code
 ```
-webcode
+web-code
 ```
 
 # Your first PR

@@ -2,9 +2,8 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-import {
-	remoteCmd
-} from './ws';
+import {resolve as pathResolve, basename, dirname, extname, join as pathJoin} from 'path';
+import mime from 'mime';
 
 import fs from './fs-proxy';
 
@@ -81,12 +80,49 @@ function renderFileList(el, data, options) {
 		});
 }
 
+function getPathInfo(path, withChildren) {
+	return new Promise(function (resolve, reject) {
+		path = pathResolve(path);
+		const name = basename(path);
+		const item = { path, name, dirName: dirname(path) };
+		return fs.stat(path)
+		.then(function (result) {
+			if (result.isFile()) {
+				const ext = extname(path).toLowerCase();
+				item.isFile = true;
+				item.size = result.size;  // File size in bytes
+				item.extension = ext;
+				item.mime = mime.lookup(path);
+				return resolve(item);
+			} else if (result.isDirectory()) {
+				item.isDir = true;
+				item.mime = 'directory';
+				if (withChildren !== false) {
+					return fs.readdir(path)
+						.then(function (arr) {
+							return Promise.all(arr.map(function (child) {
+								return getPathInfo(pathJoin(path, child), false);
+							})).then(children => {
+								item.children = children;
+								return resolve(item);
+							});
+						});
+				} else {
+					return resolve(item);
+				}
+			} else {
+				return reject(Error('Not a file or folder'));
+			}
+		});
+	});
+}
+
 function populateFileList(el, path, options) {
 	el.path = path;
-	return remoteCmd('GET_PATH_INFO', path)
+	return getPathInfo(path)
 		.then(function (data) {
 			if (data.isFile) {
-				return remoteCmd('GET_PATH_INFO', data.dirName);
+				return getPathInfo(data.dirName);
 			}
 			return data;
 		})
@@ -206,7 +242,7 @@ function openFile(data) {
 }
 
 function promptForOpen() {
-	openFileDialog(state.currentlyOpenedPath || '/').then(openPath);
+	openFileDialog(state.currentlyOpenedPath || process.env.HOME || '/').then(openPath);
 }
 
 export {

@@ -2,9 +2,7 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-import {
-	remoteCmd
-} from './ws';
+import { remoteCmd } from './ws';
 
 function fsProxy() {
 	var args = Array.from(arguments);
@@ -15,6 +13,15 @@ function fsProxy() {
 		return remoteCmd('FS_PROXY', {
 			cmd: cmd,
 			arguments: args
+		})
+		.then(function (data) {
+			if (data.__toFn) {
+				data.__toFn.forEach(function (key) {
+					var value = data[key];
+					data[key] = function () { return value; };
+				});
+			}
+			return data;
 		});
 	}
 
@@ -27,7 +34,8 @@ var fs = {};
 [
 	'stat',
 	'readFile',
-	'writeFile'
+	'writeFile',
+	'readdir'
 ].forEach(function (cmd) {
 	fs[cmd] = fsProxy(cmd);
 });

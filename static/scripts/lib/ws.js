@@ -43,6 +43,13 @@ var wsPromise = new Promise(function (resolve) {
 		ws.removeEventListener('open', firstOpen);
 		resolve(ws);
 	});
+})
+.then(function (ws) {
+	return remoteCmd('GET_ENV', 'HOME')
+	.then(function (result) {
+		process.env.HOME = result;
+		return ws;
+	});
 });
 
 export {
