@@ -40,7 +40,6 @@ function previousTab() {
 }
 
 function addBindings(editor, tab) {
-	editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, saveOpenTab);
 	editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_O, promptForOpen);
 	editor.addCommand(monaco.KeyCode.KEY_W | monaco.KeyMod.CtrlCmd, closeOpenTab);
 	editor.addCommand(monaco.KeyCode.F6, selectNextEl);
@@ -74,6 +73,16 @@ function addBindings(editor, tab) {
 	});
 	editor.onMouseDown(function () {
 		editor.webCodeState.hasJustTabbedIn.set(false);
+	});
+
+	editor.addAction({
+		id: 'web-code-save-tab',
+		label: 'Save File',
+		keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S],
+		keybindingContext: null,
+		contextMenuGroupId: 'navigation',
+		contextMenuOrder: 1.5,
+		run: saveOpenTab
 	});
 }
 
