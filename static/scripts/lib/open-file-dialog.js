@@ -120,7 +120,7 @@ openFileDialog.filelistRight.addEventListener('keydown', onkeydown);
 openFileDialog.filelistLeft.addEventListener('dblclick', ondblclick);
 openFileDialog.filelistRight.addEventListener('dblclick', ondblclick);
 openFileDialog.openButton.addEventListener('click', function () {
-	open(highlightedEl.data);
+	if (highlightedEl.data) return open(highlightedEl.data);
 });
 openFileDialog.cancelButton.addEventListener('click', function () {
 	cancel();

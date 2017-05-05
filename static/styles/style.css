@@ -19,6 +19,10 @@ body, html {
 	background-color: var(--bg-head-color);
 }
 
+button {
+	font-family: "Samsung One", "Helvetica Neue", "Calibri Light", Roboto, Helvetica, sans-serif;
+}
+
 body {
 	display: flex;
 	flex-direction: column;
@@ -102,6 +106,14 @@ main {
 
 #file-open-widget .buttons {
 	text-align: right;
+}
+
+#file-open-widget .buttons button {
+	font-size: 1.3em;
+}
+
+#file-open-widget .buttons #file-open-open {
+	filter: brightness(0.8) sepia(1) hue-rotate(50deg);
 }
 
 .file-open-widget_tools {
