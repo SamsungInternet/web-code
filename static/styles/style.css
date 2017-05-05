@@ -96,6 +96,7 @@ main {
 
 #file-open-widget.closed {
 	transform: translateX(-50%) translateY(-100%) translateY(-3em);
+	visibility: hidden;
 }
 
 #file-open-widget input[name="current-path"] {

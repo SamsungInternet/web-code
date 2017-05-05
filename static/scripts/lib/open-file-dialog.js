@@ -19,6 +19,7 @@ function openFileDialog(path) {
 		path = path || process.env.HOME || '/';
 		currentPath = path;
 		openFileDialog.el.classList.remove('closed');
+		openFileDialog.el.querySelector('a, button, [tabindex]').focus();
 		resolver = resolve;
 		rejecter = reject;
 		openFileDialog.currentPathEl.value = currentPath;

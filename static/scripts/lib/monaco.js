@@ -24,19 +24,19 @@ function getMonacoLanguageFromExtensions(extension) {
 }
 
 function selectNextEl() {
-	console.log('STUB BLUR EDITOR, NEXT EL');
+	document.querySelector('a, button, [tabindex]').focus();
 }
 
 function selectPreviousEl() {
-	console.log('STUB BLUR EDITOR, PREVIOUS EL');
+	document.querySelectorAll('a, button, [tabindex]').focus();
 }
 
 function nextTab() {
-	console.log('FOCUS NEXT TAB');
+	console.log('STUB: FOCUS NEXT TAB');
 }
 
 function previousTab() {
-	console.log('FOCUS PREVIOUS TAB');
+	console.log('STUB: FOCUS PREVIOUS TAB');
 }
 
 function addBindings(editor, tab) {
@@ -50,13 +50,18 @@ function addBindings(editor, tab) {
 	editor.addCommand(monaco.KeyCode.KEY_P | monaco.KeyMod.Shift | monaco.KeyMod.CtrlCmd, function openCommandPalette() {
 		editor.trigger('anyString', 'editor.action.quickCommand');
 	});
+	editor.addCommand(monaco.KeyCode.Tab, function() {
+		selectNextEl();
+	}, 'hasJustTabbedIn')
 
 	editor.webCodeState = {};
 	editor.webCodeState.savedAlternativeVersionId = editor.model.getAlternativeVersionId();
 	editor.webCodeState.tab = tab;
+	editor.webCodeState.hasJustTabbedIn = editor.createContextKey('hasJustTabbedIn', false);
 
 	editor.webCodeState.functions = {
 		checkForChanges: function checkForChanges() {
+			editor.webCodeState.hasJustTabbedIn.set(false);
 			var hasChanges = editor.webCodeState.savedAlternativeVersionId !== editor.model.getAlternativeVersionId();
 			editor.webCodeState.hasChanges = hasChanges;
 			tab.el.classList.toggle('has-changes', hasChanges);
@@ -64,8 +69,12 @@ function addBindings(editor, tab) {
 	}
 
 	editor.onDidChangeModelContent(editor.webCodeState.functions.checkForChanges);
-
-
+	editor.onDidFocusEditor(function () {
+		editor.webCodeState.hasJustTabbedIn.set(true);
+	});
+	editor.onMouseDown(function () {
+		editor.webCodeState.hasJustTabbedIn.set(false);
+	});
 }
 
 export { monacoPromise, getMonacoLanguageFromExtensions, getMonacoLanguageFromMimes, addBindings };
