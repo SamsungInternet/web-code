@@ -1,4 +1,4 @@
-/* global require, Map, Set, Promise */
+/* global Map, Set, Promise */
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
@@ -46,7 +46,7 @@ var tabController = (function setUpTabs() {
 		this.el.dataset.name = data.name;
 		this.el.dataset.size = data.size;
 		this.el.textContent = data.name;
-		this.el.tabIndex = 1;
+		this.el.tabIndex = 0;
 		tabsEl.appendChild(this.el);
 
 		this.el.webCodeTab = this;
@@ -59,7 +59,7 @@ var tabController = (function setUpTabs() {
 		this.closeEl.classList.add('tab_close');
 		this.closeEl.setAttribute('aria-label', 'Close Tab ' + data.name);
 		this.el.appendChild(this.closeEl);
-		this.closeEl.tabIndex = 1;
+		this.closeEl.tabIndex = 0;
 
 		var self = this;
 		this.closeEl.addEventListener('click', function () {

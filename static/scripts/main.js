@@ -1,4 +1,4 @@
-/* global require, Map, Set, Promise */
+/* global Map, Set, Promise */
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
@@ -7,14 +7,27 @@ import { wsPromise } from './lib/ws';
 import { openPath, promptForOpen, smartOpen } from './lib/files';
 import { saveOpenTab, tabController } from './lib/tab-controller';
 import { setUpSideBar } from './lib/side-bar';
+import { addScript } from './lib/utils';
 
 wsPromise.then(function init(handshakeData) {
 
+	if (process.env.DEBUG) {
+		addScript('/axe/axe.min.js').promise.then(function () {
+			window.axe.run(function (err, results) {
+				if (err) throw err;
+				console.log('a11y violations:', results.violations.length, results.violations);
+			});
+		});
+	}
+
+	// Open requested directory
 	if (handshakeData.path) {
 		return smartOpen(handshakeData.path);
 	}
 
-	db.get('INIT_STATE')
+
+	// load old state
+	return db.get('INIT_STATE')
 		.then(function (doc) {
 			if (doc.previous_path) {
 				return openPath(doc.previous_path);

@@ -26,7 +26,7 @@ app.use('/icons/', express.static(__dirname + '/node_modules/file-icons/fonts', 
 	maxAge: 3600 * 1000 * 24
 }));
 
-app.use('/pouchdb/', express.static(__dirname + '/node_modules/pouchdb-browser/lib', {
+app.use('/axe/', express.static(__dirname + '/node_modules/axe-core/', {
 	maxAge: 3600 * 1000 * 24
 }));
 
@@ -35,7 +35,8 @@ app.use('/api/', api);
 wss.on('connection', function connection(ws) {
 	ws.on('message', wsMessaging.wsRouting);
 
-	const path = nodePath.resolve(process.argv.slice(2).join(' '));
+	const args = process.argv.slice(2).join(' ').trim();
+	const path = args && nodePath.resolve(args);
 	ws.send(wsMessaging.wsSendFormat('HANDSHAKE', {
 		path: path || false
 	}));

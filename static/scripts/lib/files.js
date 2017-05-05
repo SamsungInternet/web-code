@@ -1,4 +1,4 @@
-/* global require, Map, Set, Promise, monaco */
+/* global Map, Set, Promise, monaco */
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
@@ -65,7 +65,7 @@ function renderFileList(el, data, options) {
 			li.dataset.name = datum.name;
 			li.dataset.size = datum.size;
 			li.textContent = datum.name;
-			li.tabIndex = 1;
+			li.tabIndex = 0;
 			li.data = datum;
 			el.appendChild(li);
 
@@ -246,7 +246,7 @@ function promptForOpen() {
 }
 
 function smartOpen(path) {
-	console.log('Trying to open, path');
+	console.log('Trying to open, ' + path);
 	fs.stat(path)
 	.then(function (result) {
 		if (result.isDirectory()) {

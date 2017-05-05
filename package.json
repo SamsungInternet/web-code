@@ -10,7 +10,7 @@
   "scripts": {
     "build": "rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "./node_modules/.bin/nodemon --ignore static/scripts/bundle.js --exec \"npm run build; npm run start\"",
+    "watch": "./node_modules/.bin/nodemon --ignore static/scripts/bundle.js --exec \"npm run build; DEBUG=1 npm run start\"",
     "start": "node ./"
   },
   "author": "Ada Rose Edwards",
@@ -25,6 +25,7 @@
     "ws": "^2.3.1"
   },
   "devDependencies": {
+    "axe-core": "^2.2.0",
     "nodemon": "^1.11.0",
     "pouchdb-browser": "^6.2.0",
     "rollup": "^0.41.6",

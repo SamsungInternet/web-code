@@ -1,4 +1,4 @@
-/* global require, Map, Set, Promise */
+/* global Map, Set, Promise */
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
@@ -15,6 +15,7 @@ function fsProxy() {
 			arguments: args
 		})
 		.then(function (data) {
+			if (typeof data !== 'object') return data;
 			if (data.__toFn) {
 				data.__toFn.forEach(function (key) {
 					var value = data[key];

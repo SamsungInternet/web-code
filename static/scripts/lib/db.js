@@ -1,4 +1,4 @@
-/* global require, Promise */
+/* global Promise */
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<link rel="stylesheet" href="fonts/SamsungOne/fonts.css"></link>
@@ -11,9 +11,9 @@
 <body>
 <div id="tools">
 	<h1 id="logo">Web Code</h1>
-	<button tabindex="1" aria-label="New File" title="New File" data-action="new-file"></button>
-	<button tabindex="1" aria-label="Open File" title="Open File" data-action="open-file"></button>
-	<button tabindex="1" aria-label="Save File" title="Save File" data-action="save-file"></button>
+	<button tabindex="0" aria-label="New File" title="New File" data-action="new-file"></button>
+	<button tabindex="0" aria-label="Open File" title="Open File" data-action="open-file"></button>
+	<button tabindex="0" aria-label="Save File" title="Save File" data-action="save-file"></button>
 </div>
 <main>
 	<div id="sidebar">
@@ -28,16 +28,16 @@
 
 <div id="file-open-widget" class="closed">
 	<div class="file-open-widget_tools">
-		<button tabindex="1" aria-label="Up Directory" data-action="up-dir"></button>
-		<input type="text" name="current-path"></input>
+		<button tabindex="0" aria-label="Up Directory" data-action="up-dir"></button>
+		<input type="text" aria-label="File selector widget path" name="current-path"></input>
 	</div>
 	<div class="file-selectors">
 		<ul class="filelist"></ul>
 		<ul class="filelist"></ul>
 	</div>
 	<div class="buttons">
-		<button id="file-open-cancel" tabindex="1">Cancel</button>
-		<button id="file-open-open" tabindex="1">Open</button>
+		<button id="file-open-cancel" tabindex="0">Cancel</button>
+		<button id="file-open-open" tabindex="0">Open</button>
 	</div>
 </div>
 

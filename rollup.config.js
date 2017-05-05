@@ -11,6 +11,7 @@ export default {
 	format: 'iife',
 	sourceMap: 'inline',
 	intro: `
+	/* eslint-disable */
 	var define = false;
 	var global={};
 	var process = {env: {}};
@@ -24,7 +25,11 @@ export default {
       		extensions: [ '.js', '.json' ],  // Default: ['.js']
 		}),
 		builtins(),
-		commonjs(),
-		json()
+		commonjs({
+      		include: 'node_modules/**',
+		}),
+		json({
+      		include: 'node_modules/**',
+		})
 	]
 };

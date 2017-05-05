@@ -1,8 +1,6 @@
-/* global require, Map, Set, Promise */
+/* global Map, Set, Promise */
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
-
-import {smartOpen} from './files';
 
 var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 var ws = new WebSocket((isLocal ? 'ws://' : 'wss://') + location.host);
@@ -48,6 +46,14 @@ function remoteCmd(cmd, data) {
 	});
 }
 
+function updateEnv(name) {
+	return remoteCmd('GET_ENV', name)
+	.then(function (result) {
+		if (result) process.env[name] = result;
+		return result;
+	});
+}
+
 // Connection opened
 var wsPromise = new Promise(function (resolve) {
 	ws.addEventListener('open', function firstOpen() {
@@ -55,12 +61,11 @@ var wsPromise = new Promise(function (resolve) {
 		resolve(ws);
 	});
 })
-.then(function (ws) {
-	return remoteCmd('GET_ENV', 'HOME')
-	.then(function (result) {
-		process.env.HOME = result;
-		return ws;
-	});
+.then(function () {
+	return Promise.all([
+		updateEnv('HOME'),
+		updateEnv('DEBUG'),
+	])
 })
 .then(function () {
 	return handshakePromise
