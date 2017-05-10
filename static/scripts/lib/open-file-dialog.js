@@ -44,35 +44,35 @@ function highlight(e) {
 		highlightedEl = e.target;
 		highlightedEl.classList.add('has-highlight');
 
-		currentPath = e.target.data.path;
+		currentPath = e.target.stats.path;
 		openFileDialog.currentPathEl.value = currentPath;
 
-		if (e.target.data && e.target.data.isDir) {
+		if (e.target.stats && e.target.stats.isDirectory()) {
 			if (e.currentTarget === openFileDialog.filelistLeft) {
-				if (e.target.data.name === '..') {
-					populateFileList(openFileDialog.filelistLeft, e.target.data.path, {
+				if (e.target.stats.name === '..') {
+					populateFileList(openFileDialog.filelistLeft, e.target.stats.path, {
 						nested: false
 					});
 					openFileDialog.filelistRight.innerHTML = '';
 				} else {
-					populateFileList(openFileDialog.filelistRight, e.target.data.path, {
+					populateFileList(openFileDialog.filelistRight, e.target.stats.path, {
 						nested: false
 					});
 				}
 			}
 			if (e.currentTarget === openFileDialog.filelistRight) {
-				populateFileList(openFileDialog.filelistLeft, e.target.data.dirName, {
+				populateFileList(openFileDialog.filelistLeft, e.target.stats.dirName, {
 					nested: false
 				})
 					.then(function () {
 						[].slice.call(openFileDialog.filelistLeft.children).forEach(function (el) {
-							if (el.data.path === currentPath) {
+							if (el.stats.path === currentPath) {
 								highlightedEl = e.target;
 								highlightedEl.classList.add('has-highlight');
 							}
 						});
 					});
-				populateFileList(openFileDialog.filelistRight, e.target.data.path, {
+				populateFileList(openFileDialog.filelistRight, e.target.stats.path, {
 					nested: false
 				});
 			}
@@ -82,13 +82,13 @@ function highlight(e) {
 
 function ondblclick(e) {
 	highlight(e);
-	if (e.target.data && e.target.data.isDir) return;
-	open(e.target.data);
+	if (e.target.stats && e.target.stats.isDirectory()) return;
+	open(e.target.stats);
 }
 
-function open(data) {
+function open(stats) {
 	openFileDialog.el.classList.add('closed');
-	resolver(data);
+	resolver(stats);
 	resolver = undefined;
 	rejecter = undefined;
 }
@@ -121,7 +121,7 @@ openFileDialog.filelistRight.addEventListener('keydown', onkeydown);
 openFileDialog.filelistLeft.addEventListener('dblclick', ondblclick);
 openFileDialog.filelistRight.addEventListener('dblclick', ondblclick);
 openFileDialog.openButton.addEventListener('click', function () {
-	if (highlightedEl.data) return open(highlightedEl.data);
+	if (highlightedEl.stats) return open(highlightedEl.stats);
 });
 openFileDialog.cancelButton.addEventListener('click', function () {
 	cancel();

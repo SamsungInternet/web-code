@@ -2,7 +2,8 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-import { remoteCmd } from './ws';
+import { remoteCmd } from './ws.js';
+import Stats from './web-code-stats.js'
 
 function fsProxy() {
 	var args = Array.from(arguments);
@@ -16,12 +17,7 @@ function fsProxy() {
 		})
 		.then(function (data) {
 			if (typeof data !== 'object') return data;
-			if (data.__toFn) {
-				data.__toFn.forEach(function (key) {
-					var value = data[key];
-					data[key] = function () { return value; };
-				});
-			}
+			if (data.__webStatDoc) return Stats.fromDoc(data);
 			return data;
 		});
 	}

@@ -2,21 +2,21 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-import { renderFileList } from './files';
-import state from './state';
-import { updateDBDoc } from './db';
-import fs from './fs-proxy';
+import state from './state.js';
+import { updateDBDoc } from './db.js';
+import fs from './fs-proxy.js';
+import Stats from './web-code-stats.js'
 
 function saveOpenTab() {
 	var tab = tabController.getOpenTab();
-	var data;
+	var stats;
 	if (tab && tab.editor) {
-		data = tab.data;
+		stats = tab.stats;
 	} else {
 		return;
 	}
 	var altId = tab.editor.model.getAlternativeVersionId();
-	fs.writeFile(data.path, tab.editor.getValue())
+	fs.writeFile(stats.data.path, tab.editor.getValue())
 	.then(function () {
 		tab.editor.webCodeState.savedAlternativeVersionId = altId;
 		tab.editor.webCodeState.functions.checkForChanges();
@@ -34,18 +34,18 @@ var tabController = (function setUpTabs() {
 	var tabsEl = document.querySelector('#tabs');
 
 	function updateOpenFileEl() {
-		renderFileList(currentlyOpenFilesEl, { children: Array.from(tabController.currentlyOpenFilesMap.keys()) });
+		Stats.renderFileList(currentlyOpenFilesEl, Array.from(tabController.currentlyOpenFilesMap.keys()));
 	}
 
-	function Tab(data) {
-		this.data = data;
+	function Tab(stats) {
+		this.stats = stats;
 		this.el = document.createElement('a');
 		this.el.classList.add('tab');
 		this.el.classList.add('has-icon');
-		this.el.dataset.mime = data.mime;
-		this.el.dataset.name = data.name;
-		this.el.dataset.size = data.size;
-		this.el.textContent = data.name;
+		this.el.dataset.mime = stats.data.mime;
+		this.el.dataset.name = stats.data.name;
+		this.el.dataset.size = stats.data.size;
+		this.el.textContent = stats.data.name;
 		this.el.tabIndex = 0;
 		tabsEl.appendChild(this.el);
 
@@ -57,7 +57,7 @@ var tabController = (function setUpTabs() {
 
 		this.closeEl = document.createElement('button');
 		this.closeEl.classList.add('tab_close');
-		this.closeEl.setAttribute('aria-label', 'Close Tab ' + data.name);
+		this.closeEl.setAttribute('aria-label', 'Close Tab ' + stats.data.name);
 		this.el.appendChild(this.closeEl);
 		this.closeEl.tabIndex = 0;
 
@@ -76,25 +76,25 @@ var tabController = (function setUpTabs() {
 		this.currentlyOpenFilesMap = new Map();
 	}
 
-	TabController.prototype.hasTab = function (data) {
-		return this.currentlyOpenFilesMap.has(data);
+	TabController.prototype.hasTab = function (stats) {
+		return this.currentlyOpenFilesMap.has(stats);
 	}
 
 	TabController.prototype.getOpenTab = function () {
 		return this.focusedTab;
 	}
 
-	TabController.prototype.newTab = function (data) {
-		var tab = new Tab(data);
-		this.currentlyOpenFilesMap.set(data, tab);
+	TabController.prototype.newTab = function (stats) {
+		var tab = new Tab(stats);
+		this.currentlyOpenFilesMap.set(stats, tab);
 		updateOpenFileEl();
 		this.focusTab(tab);
 		this.storeOpenTabs();
 		return tab;
 	}
 
-	TabController.prototype.focusTab = function (data) {
-		var focusedTab = data.constructor === Tab ? data : this.currentlyOpenFilesMap.get(data);
+	TabController.prototype.focusTab = function (stats) {
+		var focusedTab = stats.constructor === Tab ? stats : this.currentlyOpenFilesMap.get(stats);
 		this.focusedTab = focusedTab;
 		Array.from(this.currentlyOpenFilesMap.values()).forEach(function (tab) {
 			tab.contentEl.classList.toggle('has-focus', tab === focusedTab);
@@ -103,12 +103,12 @@ var tabController = (function setUpTabs() {
 		if (focusedTab.editor) focusedTab.editor.layout();
 	}
 
-	TabController.prototype.closeTab = function (data) {
-		var tab = data.constructor === Tab ? data : this.currentlyOpenFilesMap.get(data);
+	TabController.prototype.closeTab = function (stats) {
+		var tab = stats.constructor === Tab ? stats : this.currentlyOpenFilesMap.get(stats);
 		var tabState = Array.from(this.currentlyOpenFilesMap.values());
 		var tabIndex = tabState.indexOf(tab);
 		var nextTab = tabState[Math.max(0, tabIndex - 1)];
-		this.currentlyOpenFilesMap.delete(tab.data);
+		this.currentlyOpenFilesMap.delete(tab.stats);
 		tab.destroy();
 		updateOpenFileEl();
 		this.storeOpenTabs();
@@ -120,7 +120,9 @@ var tabController = (function setUpTabs() {
 	TabController.prototype.storeOpenTabs = function () {
 		if (!state.currentlyOpenedPath) return;
 		updateDBDoc('OPEN_TABS_FOR_' + state.currentlyOpenedPath, {
-			open_tabs: Array.from(this.currentlyOpenFilesMap.keys())
+			open_tabs: Array.from(this.currentlyOpenFilesMap.keys()).map(function (stats) {
+				return stats.toDoc();
+			})
 		})
 		.catch(function (err) {
 			console.log(err);
@@ -141,12 +143,12 @@ var tabController = (function setUpTabs() {
 	});
 
 	currentlyOpenFilesEl.addEventListener('mouseup', function (e) {
-		if (e.target.data) {
+		if (e.target.stats) {
 			if (e.button === 0) {
-				tabController.focusTab(e.target.data);
+				tabController.focusTab(e.target.stats);
 			}
 			if (e.button === 1) {
-				tabController.closeTab(e.target.data);
+				tabController.closeTab(e.target.stats);
 			}
 		}
 	});

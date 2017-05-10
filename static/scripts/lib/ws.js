@@ -22,7 +22,7 @@ ws.addEventListener('message', function m(e) {
 		if (promiseResolver) {
 			promises.delete(result[1]);
 
-			if (data.error) {
+			if (data.error) {``
 				return promiseResolver[1](Error(data.error));
 			} else {
 				return promiseResolver[0](data.result);

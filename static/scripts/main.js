@@ -2,12 +2,15 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-import { db } from './lib/db';
-import { wsPromise } from './lib/ws';
-import { openPath, promptForOpen, smartOpen } from './lib/files';
-import { saveOpenTab, tabController } from './lib/tab-controller';
-import { setUpSideBar } from './lib/side-bar';
-import { addScript } from './lib/utils';
+import { db } from './lib/db.js';
+import { wsPromise } from './lib/ws.js';
+import { openPath, promptForOpen, smartOpen } from './lib/files.js';
+import { saveOpenTab, tabController } from './lib/tab-controller.js';
+import { setUpSideBar } from './lib/side-bar.js';
+import { addScript } from './lib/utils.js';
+import Stats from './lib/web-code-stats.js';
+import fs from './lib/fs-proxy';
+window.fs = fs;
 
 wsPromise.then(function init(handshakeData) {
 
@@ -30,7 +33,7 @@ wsPromise.then(function init(handshakeData) {
 	return db.get('INIT_STATE')
 		.then(function (doc) {
 			if (doc.previous_path) {
-				return openPath(doc.previous_path);
+				return Stats.fromPath(doc.previous_path.path).then(openPath);
 			} else {
 				return promptForOpen();
 			}

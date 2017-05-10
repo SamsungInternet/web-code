@@ -21,8 +21,8 @@ function setUpSideBar() {
 
 	function onclick(e) {
 		if (e.target.tagName === 'LI') {
-			if (e.target.data.isFile) openFile(e.target.data);
-			if (e.target.data.isDir) expandDir(e.target, e.target.data);
+			if (e.target.stats.isFile()) openFile(e.target.stats);
+			if (e.target.stats.isDirectory()) expandDir(e.target, e.target.stats);
 		}
 	}
 
