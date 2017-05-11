@@ -117,6 +117,13 @@ var tabController = (function setUpTabs() {
 		}
 	}
 
+	TabController.prototype.closeAll = function () {
+		var self=this;
+		Array.from(this.currentlyOpenFilesMap.values()).forEach(function (tab) {
+			self.closeTab(tab);
+		});
+	}
+
 	TabController.prototype.storeOpenTabs = function () {
 		if (!state.currentlyOpenedPath) return;
 		updateDBDoc('OPEN_TABS_FOR_' + state.currentlyOpenedPath, {

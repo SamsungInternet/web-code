@@ -2,16 +2,16 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-import { populateFileList, openFile } from './files';
+import { populateFileList, destroyFileList, openFile } from './files';
 
 function setUpSideBar() {
 
-	function expandDir(el, data) {
+	function expandDir(el, stats) {
 		var filelistEl = el.querySelector('.filelist');
 		if (filelistEl.children.length) {
-			filelistEl.innerHTML = '';
+			destroyFileList(filelistEl);
 		} else {
-			populateFileList(filelistEl, data.path, {
+			populateFileList(filelistEl, stats.data.path, {
 				hideDotFiles: true
 			});
 		}

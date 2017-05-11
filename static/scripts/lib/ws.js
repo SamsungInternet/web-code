@@ -21,15 +21,19 @@ ws.addEventListener('message', function m(e) {
 		var data = result[2];
 		if (promiseResolver) {
 			promises.delete(result[1]);
-
-			if (data.error) {``
-				return promiseResolver[1](Error(data.error));
-			} else {
-				return promiseResolver[0](data.result);
-			}
+			return promiseResolver(data);
 		}
 		if (cmd === 'HANDSHAKE') {
 			handshakeResolver(data);
+		}
+		if (cmd === 'FS_CHANGE') {
+			console.log('CHANGE', data);
+		}
+		if (cmd === 'FS_ADD') {
+			console.log('ADD', data);
+		}
+		if (cmd === 'FS_UNLINK') {
+			console.log('UNLINK', data);
 		}
 	}
 });
@@ -41,8 +45,22 @@ function remoteCmd(cmd, data) {
 		id,
 		data
 	]));
-	return new Promise(function (resolve, reject) {
-		promises.set(id, [resolve, reject]);
+	
+	if (process.env.DEBUG) {
+		var err = new Error();
+		var stack = err.stack;
+	}
+
+	return new Promise(function (resolve) {
+		promises.set(id, resolve);
+	}).then(function (data) {
+		if (data.error) {
+			if (process.env.DEBUG) {
+				console.error(data.error, stack);
+			}
+			throw Error(data.error);
+		}
+		return data.result;
 	});
 }
 

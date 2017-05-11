@@ -10,6 +10,7 @@ const port = process.env.PORT || 3000;
 const api = require('./lib/api');
 const wsMessaging = require('./lib/ws-routing');
 const nodePath = require('path');
+const Client = require('./lib/client');
 
 const exec = require('child_process').exec;
 function puts(error, stdout, stderr) { console.log(stdout); console.log(stderr); }
@@ -34,6 +35,23 @@ app.use('/api/', api);
 
 wss.on('connection', function connection(ws) {
 	ws.on('message', wsMessaging.wsRouting);
+
+	ws.webCodeClient = new Client();
+	ws.webCodeClient.on('change', function (stats) {
+		ws.send(JSON.stringify(['FS_CHANGE', null, stats.toDoc()]));
+	});
+	ws.webCodeClient.on('add', function (stats) {
+		ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]));
+	});
+	ws.webCodeClient.on('unlink', function (stats) {
+		ws.send(JSON.stringify(['FS_UNLINK', null, stats.toDoc()]));
+	});
+	ws.webCodeClient.on('addDir', function (stats) {
+		ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]));
+	});
+	ws.webCodeClient.on('unlinkDir', function (stats) {
+		ws.send(JSON.stringify(['FS_UNLINK', null, stats.toDoc()]));
+	});
 
 	const args = process.argv.slice(2).join(' ').trim();
 	const path = args && nodePath.resolve(args);

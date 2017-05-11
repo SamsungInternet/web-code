@@ -2,7 +2,9 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-import { populateFileList } from './files';
+import { populateFileList, destroyFileList } from './files';
+import Stats from './web-code-stats';
+import { resolve, join } from 'path';
 
 var highlightedEl;
 var currentPath;
@@ -44,35 +46,36 @@ function highlight(e) {
 		highlightedEl = e.target;
 		highlightedEl.classList.add('has-highlight');
 
-		currentPath = e.target.stats.path;
+		currentPath = e.target.stats.data.path;
 		openFileDialog.currentPathEl.value = currentPath;
 
 		if (e.target.stats && e.target.stats.isDirectory()) {
 			if (e.currentTarget === openFileDialog.filelistLeft) {
-				if (e.target.stats.name === '..') {
-					populateFileList(openFileDialog.filelistLeft, e.target.stats.path, {
+				if (e.target.stats.data.name === '..') {
+					populateFileList(openFileDialog.filelistLeft, e.target.stats.data.path, {
 						nested: false
 					});
-					openFileDialog.filelistRight.innerHTML = '';
+					destroyFileList(openFileDialog.filelistRight);
 				} else {
-					populateFileList(openFileDialog.filelistRight, e.target.stats.path, {
+					populateFileList(openFileDialog.filelistRight, e.target.stats.data.path, {
 						nested: false
 					});
 				}
 			}
 			if (e.currentTarget === openFileDialog.filelistRight) {
-				populateFileList(openFileDialog.filelistLeft, e.target.stats.dirName, {
+				populateFileList(openFileDialog.filelistLeft, e.target.stats.data.dirName, {
 					nested: false
 				})
-					.then(function () {
-						[].slice.call(openFileDialog.filelistLeft.children).forEach(function (el) {
-							if (el.stats.path === currentPath) {
-								highlightedEl = e.target;
-								highlightedEl.classList.add('has-highlight');
-							}
-						});
+				.then(function () {
+					[].slice.call(openFileDialog.filelistLeft.children).forEach(function (el) {
+						if (el.stats.data.path === currentPath) {
+							highlightedEl = e.target;
+							highlightedEl.classList.add('has-highlight');
+						}
 					});
-				populateFileList(openFileDialog.filelistRight, e.target.stats.path, {
+				});
+
+				populateFileList(openFileDialog.filelistRight, e.target.stats.data.path, {
 					nested: false
 				});
 			}
@@ -104,6 +107,14 @@ function onkeydown(e) {
 	if (event.keyCode === 13) ondblclick(e);
 }
 
+function setPath(path) {
+	openFileDialog.currentPathEl.value = path;
+	populateFileList(openFileDialog.filelistLeft, path, {
+		nested: false
+	});
+	destroyFileList(openFileDialog.filelistRight);
+}
+
 openFileDialog.el = openFileDialog.el || document.querySelector('#file-open-widget');
 openFileDialog.currentPathEl = openFileDialog.currentPathEl || openFileDialog.el.querySelector('input[name="current-path"]');
 openFileDialog.filelistLeft = openFileDialog.filelistLeft || openFileDialog.el.querySelector('.filelist:first-child');
@@ -121,13 +132,14 @@ openFileDialog.filelistRight.addEventListener('keydown', onkeydown);
 openFileDialog.filelistLeft.addEventListener('dblclick', ondblclick);
 openFileDialog.filelistRight.addEventListener('dblclick', ondblclick);
 openFileDialog.openButton.addEventListener('click', function () {
-	if (highlightedEl.stats) return open(highlightedEl.stats);
+	return Stats.fromPath(openFileDialog.currentPathEl.value).then(open);
 });
 openFileDialog.cancelButton.addEventListener('click', function () {
 	cancel();
 });
 openFileDialog.upDirButton.addEventListener('click', function () {
-	console.log('STUB GO UP DIR');
+	var path = resolve(join(openFileDialog.currentPathEl.value, '/..'));
+	setPath(path);
 });
 
 export default openFileDialog;

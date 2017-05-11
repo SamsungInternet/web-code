@@ -9,6 +9,7 @@ import { db, updateDBDoc } from './db';
 import { tabController } from './tab-controller';
 import { monacoPromise, getMonacoLanguageFromExtensions, getMonacoLanguageFromMimes, addBindings } from './monaco';
 import openFileDialog from './open-file-dialog';
+import { remoteCmd } from './ws';
 
 function populateFileList(el, path, options) {
 	el.path = path;
@@ -23,23 +24,48 @@ function populateFileList(el, path, options) {
 			return stats.updateChildren();
 		})
 		.then(function (stats) {
+
+			// Teardown old file list
+			if (el.stats) {
+				el.stats.destroyFileList(el);
+			}
+
+			// set up new one
 			stats.renderFileList(el, options);
 			return stats;
 		});
+}
+
+function destroyFileList(el) {
+	if (el.stats) {
+		el.stats.destroyFileList(el);
+	}
 }
 
 function openPath(stats) {
 	if (stats.isDirectory()) {
 
 		if (state.currentlyOpenedPath !== stats.data.path) {
-			// TODO: close all tabs
+			tabController.closeAll();
+
+			// Let server know
+			remoteCmd('CLIENT', {
+				cmd: 'setPath',
+				arguments: [stats.data.path]
+			});
 
 			// Then open the saved tabs from last time
 			db.get('OPEN_TABS_FOR_' + stats.data.path).then(function (tabs) {
 				Promise.all(tabs.open_tabs.map(function (obj) {
-					return Stats.fromPath(obj.path);
+					return Stats.fromPath(obj.path)
+					.catch(function (e) {
+						console.log(e.message);
+						return null;
+					});;
 				})).then(function (statsArray) {
-					statsArray.forEach(function (stats) {
+					statsArray.filter(function (a) {
+						return a !== null;
+					}).forEach(function (stats) {
 						openFile(stats);
 					});
 				});
@@ -53,6 +79,9 @@ function openPath(stats) {
 		var filelist = document.getElementById('directory');
 		populateFileList(filelist, stats.data.path, {
 			hideDotFiles: true
+		})
+		.catch(function (e) {
+			throw e;	
 		});
 
 		updateDBDoc('INIT_STATE', {
@@ -86,6 +115,9 @@ function openFile(stats) {
 					language: language
 				});
 				addBindings(newTab.editor, newTab);
+			})
+			.catch(function (e) {
+				console.log(e.message);	
 			});
 	}
 }
@@ -112,5 +144,6 @@ export {
 	openFile,
 	openPath,
 	promptForOpen,
-	smartOpen
+	smartOpen,
+	destroyFileList
 };

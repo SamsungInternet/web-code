@@ -10,21 +10,21 @@ var pathToDataMap = new Map();
 
 var fsFromFn = ['isFile', 'isDirectory', 'isBlockDevice', 'isCharacterDevice', 'isSymbolicLink', 'isFIFO', 'isSocket'];
 var fsStatic = [
-  'dev',
-  'mode',
-  'nlink',
-  'uid',
-  'gid',
-  'rdev',
-  'blksize',
-  'ino',
-  'size',
-  'blocks',
-  'atime',
-  'mtime',
-  'ctime',
-  'birthtime',
-  'path'
+	'dev',
+	'mode',
+	'nlink',
+	'uid',
+	'gid',
+	'rdev',
+	'blksize',
+	'ino',
+	'size',
+	'blocks',
+	'atime',
+	'mtime',
+	'ctime',
+	'birthtime',
+	'path'
 ];
 var keys = fsStatic.concat(fsFromFn);
 
@@ -33,100 +33,105 @@ var keys = fsStatic.concat(fsFromFn);
  * Special type of singleton which returns the same object for each path.
  */
 export default function Stats (data) {
-    if (pathToDataMap.has(data.path)) {
-        var existing = pathToDataMap.get(data.path);
-        existing.update(data);
-        return existing;
-    }
-    this.fileLists = [];
-    this.data = {};
-    this.update(data);
-    pathToDataMap.set(data.path, this);
+	if (pathToDataMap.has(data.path)) {
+		var existing = pathToDataMap.get(data.path);
+		existing.update(data);
+		return existing;
+	}
+	this.fileLists = new Set();
+	this.data = {};
+	this.update(data);
+	pathToDataMap.set(data.path, this);
 }
 
 Stats.prototype.update = function update(data) {
 
     // Rerender file lists
-    if (this.fileLists.length) {
-        console.log('STUB: UPDATE FILELISTS',this.fileLists);
-    }
+	if (this.fileLists.size) {
+		console.log('STUB: UPDATE FILELISTS',this.fileLists);
+	}
 
-    this.data.name = basename(data.path);
-    this.data.dirName = dirname(data.path);
-    this.data.extension = extname(data.path).toLowerCase();
-    this.data.mime = data.isFile ? mime.lookup(data.path) : 'directory';
+	this.data.name = basename(data.path);
+	this.data.dirName = dirname(data.path);
+	this.data.extension = extname(data.path).toLowerCase();
+	this.data.mime = data.isFile ? mime.lookup(data.path) : 'directory';
 
-    keys.forEach(function (key) {
-        this.data[key] = data[key];
-    }.bind(this));
+	keys.forEach(function (key) {
+		this.data[key] = data[key];
+	}.bind(this));
 
-    if (this.isDirectory() && !this.children) {
-        this.children = [];
-        this.childrenPopulated = false;
-    }
+	if (this.isDirectory() && !this.children) {
+		this.children = [];
+		this.childrenPopulated = false;
+	}
 }
 
 Stats.prototype.toDoc = function toDoc() {
-    var out = {
-        __webStatDoc: true
-    };
-    keys.forEach(function (key) {
-        out[key] = this.data[key];
-    }.bind(this));
-    return out;
+	var out = {
+		__webStatDoc: true
+	};
+	keys.forEach(function (key) {
+		out[key] = this.data[key];
+	}.bind(this));
+	return out;
 }
 
 Stats.prototype.updateChildren = function () {
-    if(!this.isDirectory()) throw Error('Not a directory');
-    var self = this;
-    return fs.readdir(self.data.path)
-        .then(function (arr) {
-            return Promise.all(arr.map(function (child) {
-                return Stats.fromPath(join(self.data.path, child));
-            }));
-        })
-        .then(function (statsArray) {
-            self.children.splice(0);
-            self.children.push.apply(self.children, statsArray);
-            return self;  
-        });
+	if(!this.isDirectory()) throw Error('Not a directory');
+	var self = this;
+	return fs.readdir(self.data.path)
+	.then(function (arr) {
+		return Promise.all(arr.map(function (child) {
+			return Stats.fromPath(join(self.data.path, child));
+		}));
+	})
+	.then(function (statsArray) {
+		self.children.splice(0);
+		self.children.push.apply(self.children, statsArray);
+		return self;  
+	});
+}
+
+Stats.prototype.destroyFileList = function (el) {
+	el.stats = undefined;
+	this.fileLists.delete(el);
+	el.innerHTML = '';
 }
 
 Stats.prototype.renderFileList = function (el, options) {
 	el.stats = this;
-    this.fileLists.push(el);
-    Stats.renderFileList(el, this.children, options);
+	this.fileLists.add(el);
+	Stats.renderFileList(el, this.children, options);
 }
 
 // add isFile isDirectory etc
 fsFromFn.forEach(function (key) {
-    Stats.prototype[key] = new Function('return this.data["' + key + '"];');
+	Stats.prototype[key] = new Function('return this.data["' + key + '"];');
 });
 
 Stats.fromPath = function (path) {
-    return fs.stat(path);
+	return fs.stat(path);
 }
 
 Stats.fromDoc = function (data) {
-    return new Stats(data);
+	return new Stats(data);
 }
 
 Stats.fromNodeStats = function (path, nodeStat) {
 
-    var out = {};
+	var out = {};
 
-    fsFromFn.forEach(key => out[key] = nodeStat[key]());
-    keys.forEach(key => {
-        if (typeof nodeStat[key] !== 'function' && typeof nodeStat[key] !== 'object') {
-            out[key] = nodeStat[key];
-        }
-    });
+	fsFromFn.forEach(key => out[key] = nodeStat[key]());
+	keys.forEach(key => {
+		if (typeof nodeStat[key] !== 'function' && typeof nodeStat[key] !== 'object') {
+			out[key] = nodeStat[key];
+		}
+	});
 
-    out.path = pathResolve(path);
+	out.path = pathResolve(path);
 
-    return new Stats(out);
+	return new Stats(out);
 }
-
 
 Stats.renderFileList = function renderFileList(el, array, options) {
 
@@ -169,24 +174,24 @@ Stats.renderFileList = function renderFileList(el, array, options) {
 			}
 		});
 
-		sortedData.map(function (stats) {
-			var li = document.createElement('li');
-			li.classList.add('has-icon');
-			li.dataset.mime = stats.data.mime;
-			li.dataset.name = stats.data.name;
-			li.dataset.size = stats.data.size;
-			li.textContent = stats.data.name;
-			li.tabIndex = 0;
-			li.stats = stats;
-			el.appendChild(li);
+	sortedData.map(function (stats) {
+		var li = document.createElement('li');
+		li.classList.add('has-icon');
+		li.dataset.mime = stats.data.mime;
+		li.dataset.name = stats.data.name;
+		li.dataset.size = stats.data.size;
+		li.textContent = stats.data.name;
+		li.tabIndex = 0;
+		li.stats = stats;
+		el.appendChild(li);
 
-			if (stats.isDirectory() && useOptions.nested !== false) {
-				var newFileList = document.createElement('ul');
-				newFileList.classList.add('filelist');
-				li.appendChild(newFileList);
-				if (stats.children) {
-					renderFileList(newFileList, stats.children, useOptions);
-				}
+		if (stats.isDirectory() && useOptions.nested !== false) {
+			var newFileList = document.createElement('ul');
+			newFileList.classList.add('filelist');
+			li.appendChild(newFileList);
+			if (stats.children) {
+				renderFileList(newFileList, stats.children, useOptions);
 			}
-		});
+		}
+	});
 }
