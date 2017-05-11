@@ -190,7 +190,7 @@ Stats.renderFileList = function renderFileList(el, array, options) {
 			newFileList.classList.add('filelist');
 			li.appendChild(newFileList);
 			if (stats.children) {
-				renderFileList(newFileList, stats.children, useOptions);
+				stats.renderFileList(newFileList, useOptions);
 			}
 		}
 	});
