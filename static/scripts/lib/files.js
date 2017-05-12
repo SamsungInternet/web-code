@@ -50,7 +50,7 @@ function openPath(stats) {
 
 			// Let server know
 			remoteCmd('CLIENT', {
-				cmd: 'setPath',
+				cmd: 'watchPath',
 				arguments: [stats.data.path]
 			});
 

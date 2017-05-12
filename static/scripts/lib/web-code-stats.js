@@ -48,7 +48,7 @@ Stats.prototype.update = function update(data) {
 
     // Rerender file lists
 	if (this.fileLists.size) {
-		console.log('STUB: UPDATE FILELISTS',this.fileLists);
+		console.log('STUB: UPDATE FILELISTS',this.data.path,Array.from(this.fileLists));
 	}
 
 	this.data.name = basename(data.path);
@@ -78,6 +78,7 @@ Stats.prototype.toDoc = function toDoc() {
 
 Stats.prototype.updateChildren = function () {
 	if(!this.isDirectory()) throw Error('Not a directory');
+
 	var self = this;
 	return fs.readdir(self.data.path)
 	.then(function (arr) {
@@ -101,6 +102,10 @@ Stats.prototype.destroyFileList = function (el) {
 Stats.prototype.renderFileList = function (el, options) {
 	el.stats = this;
 	this.fileLists.add(el);
+	el.dataset.mime = this.data.mime;
+	el.dataset.name = this.data.name;
+	el.dataset.size = this.data.size;
+
 	Stats.renderFileList(el, this.children, options);
 }
 
@@ -142,8 +147,6 @@ Stats.renderFileList = function renderFileList(el, array, options) {
 		nestingLimit: (options.nestingLimit || 5) - 1
 	}
 	if (options.nestingLimit === 0) return;
-
-	el.innerHTML = '';
 
 	var sortedData = Array.from(array)
 		.filter(function (stats) {

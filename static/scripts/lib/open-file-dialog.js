@@ -107,7 +107,7 @@ function onkeydown(e) {
 	if (event.keyCode === 13) ondblclick(e);
 }
 
-function setPath(path) {
+function setDialogPath(path) {
 	openFileDialog.currentPathEl.value = path;
 	populateFileList(openFileDialog.filelistLeft, path, {
 		nested: false
@@ -139,7 +139,7 @@ openFileDialog.cancelButton.addEventListener('click', function () {
 });
 openFileDialog.upDirButton.addEventListener('click', function () {
 	var path = resolve(join(openFileDialog.currentPathEl.value, '/..'));
-	setPath(path);
+	setDialogPath(path);
 });
 
 export default openFileDialog;

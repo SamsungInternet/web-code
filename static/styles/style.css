@@ -43,12 +43,12 @@ main {
 #directory {
 	flex-grow: 2;
 	border-width: 0 1px 0 0;
-	padding-top: 0.5em;
+	margin-top: 0.5em;
 	background: var(--bg-side-color);
 }
 
 #currently-open-files {
-	padding-top: 0.5em;
+	margin-top: 0.5em;
 	border-width: 0 1px 1px 0px;
 	background: var(--bg-side-color);
 	border-top-right-radius: 1em;
@@ -169,6 +169,19 @@ main {
 	overflow: auto;
 	list-style: none;
 	padding: 0;
+}
+
+.filelist:before {
+	content: attr(data-name);
+    padding-left: 0.25em;
+    background-color: var(--bg-head-color);
+    color: white;
+    display: block;
+    border-bottom: 3px solid grey;
+}
+
+.filelist .filelist:before {
+	content: none;
 }
 
 .filelist .filelist {
