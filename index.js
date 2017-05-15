@@ -47,14 +47,14 @@ wss.on('connection', function connection(ws) {
 	ws.webCodeClient.on('add', function (stats) {
 		ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]));
 	});
-	ws.webCodeClient.on('unlink', function (stats) {
-		ws.send(JSON.stringify(['FS_UNLINK', null, stats.toDoc()]));
+	ws.webCodeClient.on('unlink', function (obj) {
+		ws.send(JSON.stringify(['FS_UNLINK', null, obj]));
 	});
 	ws.webCodeClient.on('addDir', function (stats) {
 		ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]));
 	});
-	ws.webCodeClient.on('unlinkDir', function (stats) {
-		ws.send(JSON.stringify(['FS_UNLINK', null, stats.toDoc()]));
+	ws.webCodeClient.on('unlinkDir', function (obj) {
+		ws.send(JSON.stringify(['FS_UNLINK', null, obj]));
 	});
 
 	const args = process.argv.slice(2).join(' ').trim();

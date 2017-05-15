@@ -8,6 +8,7 @@ export default {
 	sourceMap: 'inline',
 	intro: `
 	/* eslint-disable */
+	var isServer = true;
 	`,
 	plugins: []
 };

@@ -41,7 +41,6 @@ wsPromise.then(function init(handshakeData) {
 		})
 		.catch(function (err) {
 			console.log(err);
-			return promptForOpen();
 		})
 		.then(function () {
 			setUpScratch();

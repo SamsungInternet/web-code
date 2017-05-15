@@ -1,10 +1,11 @@
-/* global Map, Set, Promise, fs */
+/* global Map, Set, Promise, fs, isServer */
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
 import { resolve as pathResolve, basename, dirname, extname, join } from 'path';
 import mime from 'mime';
 import renderFileList from './render-file-list.js';
+import { remoteCmd } from './ws.js';
 
 // Map to prevent duplicate data objects for each file
 var pathToDataMap = new Map();
@@ -47,10 +48,7 @@ export default function Stats (data) {
 
 Stats.prototype.update = function update(data) {
 
-    // Rerender file lists
-	if (this.fileLists.size) {
-		console.log('STUB: UPDATE FILELISTS',this.data.path,Array.from(this.fileLists));
-	}
+	var self = this;
 
 	this.data.name = basename(data.path);
 	this.data.dirName = dirname(data.path);
@@ -64,6 +62,14 @@ Stats.prototype.update = function update(data) {
 	if (this.isDirectory() && !this.children) {
 		this.children = [];
 		this.childrenPopulated = false;
+	}
+
+    // Rerender file lists
+	if (this.fileLists.size) {
+		Array.from(this.fileLists).forEach(function (filelistEl) {
+			filelistEl.innerHTML = '';
+			self.renderFileList(filelistEl, filelistEl.filelistOptions);
+		});
 	}
 }
 
@@ -90,6 +96,15 @@ Stats.prototype.updateChildren = function () {
 	.then(function (statsArray) {
 		self.children.splice(0);
 		self.children.push.apply(self.children, statsArray);
+
+		// Let server know	
+		if (!isServer) remoteCmd('CLIENT', {
+			cmd: 'watchPath',
+			arguments: [self.data.path]
+		});
+
+		self.update(self.data);
+
 		return self;  
 	});
 }
@@ -101,6 +116,9 @@ Stats.prototype.destroyFileList = function (el) {
 }
 
 Stats.prototype.renderFileList = function (el, options) {
+
+	el.filelistOptions = options;
+
 	el.stats = this;
 	this.fileLists.add(el);
 	el.dataset.mime = this.data.mime;

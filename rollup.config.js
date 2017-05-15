@@ -15,6 +15,7 @@ export default {
 	var define = false;
 	var global={};
 	var process = {env: {}};
+	var isServer = false;
 	`,
 	plugins: [
 		resolve({

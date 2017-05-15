@@ -2,14 +2,13 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-import fs from './fs-proxy';
+import fs from './fs-proxy.js';
 import Stats from './web-code-stats.js';
-import state from './state';
-import { db, updateDBDoc } from './db';
-import { tabController } from './tab-controller';
-import { monacoPromise, getMonacoLanguageFromExtensions, getMonacoLanguageFromMimes, addBindings, monacoSettings } from './monaco';
-import openFileDialog from './open-file-dialog';
-import { remoteCmd } from './ws';
+import state from './state.js';
+import { db, updateDBDoc } from './db.js';
+import { tabController } from './tab-controller.js';
+import { monacoPromise, getMonacoLanguageFromExtensions, getMonacoLanguageFromMimes, addBindings, monacoSettings } from './monaco.js';
+import openFileDialog from './open-file-dialog.js';
 
 function populateFileList(el, path, options) {
 	el.path = path;
@@ -21,18 +20,17 @@ function populateFileList(el, path, options) {
 			return stats;
 		})
 		.then(function (stats) {
-			return stats.updateChildren();
-		})
-		.then(function (stats) {
 
-			// Teardown old file list
+			// Teardown old file list if one is present
 			if (el.stats) {
 				el.stats.destroyFileList(el);
 			}
 
 			// set up new one
 			stats.renderFileList(el, options);
-			return stats;
+
+			// Update the filelist from the server
+			return stats.updateChildren();
 		});
 }
 
@@ -47,12 +45,6 @@ function openPath(stats) {
 
 		if (state.currentlyOpenedPath !== stats.data.path) {
 			tabController.closeAll();
-
-			// Let server know
-			remoteCmd('CLIENT', {
-				cmd: 'watchPath',
-				arguments: [stats.data.path]
-			});
 
 			// Then open the saved tabs from last time
 			db.get('OPEN_TABS_FOR_' + stats.data.path).then(function (tabs) {
