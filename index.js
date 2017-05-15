@@ -31,6 +31,10 @@ app.use('/axe/', express.static(__dirname + '/node_modules/axe-core/', {
 	maxAge: 3600 * 1000 * 24
 }));
 
+app.use('/fira/', express.static(__dirname + '/node_modules/FiraCode/distr', {
+	maxAge: 3600 * 1000 * 24
+}));
+
 app.use('/api/', api);
 
 wss.on('connection', function connection(ws) {

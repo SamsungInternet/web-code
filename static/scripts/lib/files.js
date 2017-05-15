@@ -7,7 +7,7 @@ import Stats from './web-code-stats.js';
 import state from './state';
 import { db, updateDBDoc } from './db';
 import { tabController } from './tab-controller';
-import { monacoPromise, getMonacoLanguageFromExtensions, getMonacoLanguageFromMimes, addBindings } from './monaco';
+import { monacoPromise, getMonacoLanguageFromExtensions, getMonacoLanguageFromMimes, addBindings, monacoSettings } from './monaco';
 import openFileDialog from './open-file-dialog';
 import { remoteCmd } from './ws';
 
@@ -57,11 +57,12 @@ function openPath(stats) {
 			// Then open the saved tabs from last time
 			db.get('OPEN_TABS_FOR_' + stats.data.path).then(function (tabs) {
 				Promise.all(tabs.open_tabs.map(function (obj) {
+					if (!obj.path) return null;
 					return Stats.fromPath(obj.path)
 					.catch(function (e) {
 						console.log(e.message);
 						return null;
-					});;
+					});
 				})).then(function (statsArray) {
 					statsArray.filter(function (a) {
 						return a !== null;
@@ -103,6 +104,7 @@ function openFile(stats) {
 		tabController.focusTab(stats);
 	} else {
 		var newTab = tabController.newTab(stats);
+		tabController.focusTab(newTab);
 
 		return Promise.all([fs.readFile(stats.data.path, 'utf8'), monacoPromise])
 			.then(function (arr) {
@@ -110,10 +112,10 @@ function openFile(stats) {
 			})
 			.then(function (fileContents) {
 				var language = getMonacoLanguageFromMimes(stats.data.mime) || getMonacoLanguageFromExtensions(stats.data.extension);
-				newTab.editor = monaco.editor.create(newTab.contentEl, {
+				newTab.editor = monaco.editor.create(newTab.contentEl, monacoSettings({
 					value: fileContents,
 					language: language
-				});
+				}));
 				addBindings(newTab.editor, newTab);
 			})
 			.catch(function (e) {
@@ -123,7 +125,7 @@ function openFile(stats) {
 }
 
 function promptForOpen() {
-	openFileDialog(state.currentlyOpenedPath || process.env.HOME || '/').then(openPath);
+	return openFileDialog(state.currentlyOpenedPath || process.env.HOME || '/').then(openPath);
 }
 
 function smartOpen(path) {

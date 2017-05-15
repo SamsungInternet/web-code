@@ -14,8 +14,9 @@ body, html {
     letter-spacing: 0.02em;
     font-size: 16px;
     color: #333;
-	--bg-head-color: #666;
-	--bg-side-color: white;
+	--bg-head-color: #333;
+	--file-list-bg: #555;
+	--file-list-fg: white;
 	background-color: var(--bg-head-color);
 }
 
@@ -42,15 +43,17 @@ main {
 
 #directory {
 	flex-grow: 2;
-	border-width: 0 1px 0 0;
+	border-width: 0;
 	margin-top: 0.5em;
-	background: var(--bg-side-color);
+	background: var(--file-list-bg);
+	color: var(--file-list-fg);
 }
 
 #currently-open-files {
 	margin-top: 0.5em;
-	border-width: 0 1px 1px 0px;
-	background: var(--bg-side-color);
+	border-width: 0;
+	background: var(--file-list-bg);
+	color: var(--file-list-fg);
 	border-top-right-radius: 1em;
 }
 

@@ -6,6 +6,7 @@ import state from './state.js';
 import { updateDBDoc } from './db.js';
 import fs from './fs-proxy.js';
 import Stats from './web-code-stats.js'
+import renderFileList from './render-file-list.js';
 
 function saveOpenTab() {
 	var tab = tabController.getOpenTab();
@@ -34,19 +35,68 @@ var tabController = (function setUpTabs() {
 	var tabsEl = document.querySelector('#tabs');
 
 	function updateOpenFileEl() {
-		Stats.renderFileList(currentlyOpenFilesEl, Array.from(tabController.currentlyOpenFilesMap.keys()));
+		currentlyOpenFilesEl.innerHTML = '';
+		renderFileList(currentlyOpenFilesEl, Array.from(tabController.currentlyOpenFilesMap.keys()), {
+			sort: false
+		});
 	}
 
 	function Tab(stats) {
-		this.stats = stats;
-		this.el = document.createElement('a');
-		this.el.classList.add('tab');
-		this.el.classList.add('has-icon');
-		this.el.dataset.mime = stats.data.mime;
-		this.el.dataset.name = stats.data.name;
-		this.el.dataset.size = stats.data.size;
-		this.el.textContent = stats.data.name;
-		this.el.tabIndex = 0;
+
+		var addCloseButton = false;
+
+		// It is a reference to a file
+		if (stats.constructor === Stats) {
+			this.stats = stats;
+			this.el = document.createElement('a');
+			this.el.classList.add('tab');
+			this.el.classList.add('has-icon');
+			this.el.dataset.mime = stats.data.mime;
+			this.el.dataset.name = stats.data.name;
+			this.el.textContent = stats.data.name;
+			this.el.tabIndex = 0;
+			addCloseButton = true;
+		} else if (stats.name) {
+			/* It is a custom tab with
+				{
+					name,
+					icon,
+					mime,
+					hasCloseButton [bool]
+				}
+			*/
+			this.stats = stats;
+			this.el = document.createElement('a');
+			this.el.classList.add('tab');
+			this.el.dataset.name = stats.name;
+			this.el.textContent = stats.name;
+			if (stats.icon) {
+				this.el.classList.add('has-icon');
+				this.el.dataset.icon = stats.icon;
+			}
+			if (stats.mime) {
+				this.el.dataset.mime = stats.mime;
+			}
+			if (stats.hasCloseButton) {
+				addCloseButton = true;
+			}
+			this.el.tabIndex = 0;
+		}
+
+		if (addCloseButton) {
+
+			this.closeEl = document.createElement('button');
+			this.closeEl.classList.add('tab_close');
+			this.closeEl.setAttribute('aria-label', 'Close Tab ' + stats.data.name);
+			this.el.appendChild(this.closeEl);
+			this.closeEl.tabIndex = 0;
+
+			var self = this;
+			this.closeEl.addEventListener('click', function () {
+				tabController.closeTab(self);
+			});
+		}
+
 		tabsEl.appendChild(this.el);
 
 		this.el.webCodeTab = this;
@@ -54,17 +104,7 @@ var tabController = (function setUpTabs() {
 		this.contentEl = document.createElement('div');
 		this.contentEl.classList.add('tab-content');
 		containerEl.appendChild(this.contentEl);
-
-		this.closeEl = document.createElement('button');
-		this.closeEl.classList.add('tab_close');
-		this.closeEl.setAttribute('aria-label', 'Close Tab ' + stats.data.name);
-		this.el.appendChild(this.closeEl);
-		this.closeEl.tabIndex = 0;
-
-		var self = this;
-		this.closeEl.addEventListener('click', function () {
-			tabController.closeTab(self);
-		});
+		
 	}
 
 	Tab.prototype.destroy = function () {
@@ -88,7 +128,6 @@ var tabController = (function setUpTabs() {
 		var tab = new Tab(stats);
 		this.currentlyOpenFilesMap.set(stats, tab);
 		updateOpenFileEl();
-		this.focusTab(tab);
 		this.storeOpenTabs();
 		return tab;
 	}
@@ -128,11 +167,31 @@ var tabController = (function setUpTabs() {
 		if (!state.currentlyOpenedPath) return;
 		updateDBDoc('OPEN_TABS_FOR_' + state.currentlyOpenedPath, {
 			open_tabs: Array.from(this.currentlyOpenFilesMap.keys()).map(function (stats) {
-				return stats.toDoc();
+				return stats.constructor === Stats ? stats.toDoc() : stats;
 			})
 		})
 		.catch(function (err) {
 			console.log(err);
+		});
+	}
+
+	/**
+	 * All the elements in the array are moved to the start in the order they appear.
+	 */
+	TabController.prototype.setOrder= function(arr) {
+		var old = new Set(tabsEl.children);
+		tabsEl.innerHTML = '';
+		arr.forEach(function (el) {
+			if (el.constructor === Tab) {
+				el = el.el;
+			}
+			if (old.has(el.el)) {
+				tabsEl.appendChild(el);
+				old.delete(el);
+			}
+		});
+		Array.from(old).forEach(function (el) {
+			tabsEl.appendChild(el);
 		});
 	}
 
@@ -150,12 +209,12 @@ var tabController = (function setUpTabs() {
 	});
 
 	currentlyOpenFilesEl.addEventListener('mouseup', function (e) {
-		if (e.target.stats) {
+		if (e.target.tabKey) {
 			if (e.button === 0) {
-				tabController.focusTab(e.target.stats);
+				tabController.focusTab(e.target.tabKey);
 			}
 			if (e.button === 1) {
-				tabController.closeTab(e.target.stats);
+				tabController.closeTab(e.target.tabKey);
 			}
 		}
 	});

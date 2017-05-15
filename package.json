@@ -8,6 +8,7 @@
     "web-code": "./index.js"
   },
   "scripts": {
+    "install": "napa tonsky/FiraCode",
     "build": "rollup -c",
     "build-server": "rollup -c rollup-isomorphic.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,6 +24,7 @@
     "mime": "^1.3.4",
     "monaco": "^1.201704190613.0",
     "monaco-editor": "^0.8.3",
+    "napa": "^2.3.0",
     "ws": "^2.3.1"
   },
   "devDependencies": {
@@ -62,7 +64,10 @@
         1,
         "single"
       ],
-      "indent": ["error", "tab"],
+      "indent": [
+        "error",
+        "tab"
+      ],
       "no-loop-func": 2,
       "no-irregular-whitespace": 2,
       "no-multi-spaces": 2,

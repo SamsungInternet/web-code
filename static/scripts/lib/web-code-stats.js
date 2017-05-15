@@ -4,6 +4,7 @@
 
 import { resolve as pathResolve, basename, dirname, extname, join } from 'path';
 import mime from 'mime';
+import renderFileList from './render-file-list.js';
 
 // Map to prevent duplicate data objects for each file
 var pathToDataMap = new Map();
@@ -106,7 +107,7 @@ Stats.prototype.renderFileList = function (el, options) {
 	el.dataset.name = this.data.name;
 	el.dataset.size = this.data.size;
 
-	Stats.renderFileList(el, this.children, options);
+	renderFileList(el, this.children, options);
 }
 
 // add isFile isDirectory etc
@@ -136,65 +137,4 @@ Stats.fromNodeStats = function (path, nodeStat) {
 	out.path = pathResolve(path);
 
 	return new Stats(out);
-}
-
-Stats.renderFileList = function renderFileList(el, array, options) {
-
-	options = options || {};
-	var useOptions = {
-		hideDotFiles: (options.hideDotFiles !== undefined ? options.hideDotFiles : true),
-		nested: (options.nested !== undefined ? options.nested : true),
-		nestingLimit: (options.nestingLimit || 5) - 1
-	}
-	if (options.nestingLimit === 0) return;
-
-	var sortedData = Array.from(array)
-		.filter(function (stats) {
-
-			// Whether to hide dotfiles
-			if (stats.data.name !== '..' && useOptions.hideDotFiles !== false) {
-				return stats.data.name[0] !== '.';
-			}
-			return true;
-		})
-		.sort(function (a, b) {
-			if (a.name === '..') {
-				return -1;
-			}
-			if (b.name === '..') {
-				return 1;
-			}
-			if (
-				(a.isDirectory() === b.isDirectory()) &&
-				(a.isFile() === b.isFile())
-			) {
-				return ([a.data.name, b.data.name].sort(function (a, b) {
-					return a.toLowerCase().localeCompare(b.toLowerCase());
-				})[0] === a.data.name ? -1 : 1);
-			} else {
-				if (a.isDirectory()) return -1;
-				return 1;
-			}
-		});
-
-	sortedData.map(function (stats) {
-		var li = document.createElement('li');
-		li.classList.add('has-icon');
-		li.dataset.mime = stats.data.mime;
-		li.dataset.name = stats.data.name;
-		li.dataset.size = stats.data.size;
-		li.textContent = stats.data.name;
-		li.tabIndex = 0;
-		li.stats = stats;
-		el.appendChild(li);
-
-		if (stats.isDirectory() && useOptions.nested !== false) {
-			var newFileList = document.createElement('ul');
-			newFileList.classList.add('filelist');
-			li.appendChild(newFileList);
-			if (stats.children) {
-				stats.renderFileList(newFileList, useOptions);
-			}
-		}
-	});
 }

@@ -1,10 +1,11 @@
-/* global Map, Set, Promise */
+/* global Map, Set, Promise, monaco */
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
 import { db } from './lib/db.js';
 import { wsPromise } from './lib/ws.js';
 import { openPath, promptForOpen, smartOpen } from './lib/files.js';
+import { monacoPromise, addBindings, monacoSettings } from './lib/monaco';
 import { saveOpenTab, tabController } from './lib/tab-controller.js';
 import { setUpSideBar } from './lib/side-bar.js';
 import { addScript } from './lib/utils.js';
@@ -39,10 +40,34 @@ wsPromise.then(function init(handshakeData) {
 			}
 		})
 		.catch(function (err) {
-			promptForOpen();
 			console.log(err);
+			return promptForOpen();
+		})
+		.then(function () {
+			setUpScratch();
 		});
 });
+
+// Add a special tab for taking notes.
+function setUpScratch() {
+	var tab = tabController.newTab({
+		name: 'Scratchpad'
+	});
+
+	// Puts new tab at the start rest get moved after it
+	tabController.setOrder([
+		tab
+	]);
+
+	return monacoPromise
+			.then(function () {
+				tab.editor = monaco.editor.create(tab.contentEl, monacoSettings());
+				addBindings(tab.editor, tab);
+			})
+			.catch(function (e) {
+				console.log(e.message);	
+			});
+}
 
 (function setUpToolBar() {
 	document.querySelector('button[data-action="open-file"]').addEventListener('click', promptForOpen);

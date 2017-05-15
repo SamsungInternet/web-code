@@ -5,10 +5,48 @@
 import { saveOpenTab, closeOpenTab } from './tab-controller';
 import { promptForOpen } from './files';
 
+var settings = {
+	theme: 'web-code',
+	fontSize: 14,
+	fontLigatures: true,
+	fontFamily: '"Operator Mono", "Fira Code"'
+}
+var settingsKeys = Object.keys(settings);
+
+function monacoSettings(inObj) {
+	inObj = inObj || {};
+	settingsKeys.forEach(function (key) {
+		if (inObj[key] === undefined) {
+			inObj[key] = settings[key];
+		}
+	})
+	return inObj;
+}
+
 require.config({ paths: { 'vs': 'vs' } });
 
 var monacoPromise = new Promise(function (resolve) {
 	require(['vs/editor/editor.main'], resolve);
+})
+.then(function () {
+	monaco.editor.defineTheme('web-code', {
+		base: 'vs-dark',
+		inherit: true,
+		rules: [
+			{ token: 'comment', foreground: 'ffa500', fontStyle: 'italic' },
+			{ token: 'punctuation.definition.comment', fontStyle: 'italic' },
+			{ token: 'constant.language.this.js', fontStyle: 'italic' },
+			{ token: 'variable.language', fontStyle: 'italic' },
+			{ token: 'entity.other.attribute-name', fontStyle: 'italic' },
+			{ token: 'tag.decorator.js', fontStyle: 'italic' },
+			{ token: 'entity.name.tag.js,', fontStyle: 'italic' },
+			{ token: 'tag.decorator.js', fontStyle: 'italic' },
+			{ token: 'punctuation.definition.tag.js', fontStyle: 'italic' },
+			{ token: 'source.js', fontStyle: 'italic' },
+			{ token: 'constant.other.object.key.js', fontStyle: 'italic' },
+			{ token: 'string.unquoted.label.js', fontStyle: 'italic' },
+		]
+	});	
 });
 
 function getMonacoLanguageFromMimes(mime) {
@@ -86,4 +124,4 @@ function addBindings(editor, tab) {
 	});
 }
 
-export { monacoPromise, getMonacoLanguageFromExtensions, getMonacoLanguageFromMimes, addBindings };
+export { monacoPromise, getMonacoLanguageFromExtensions, getMonacoLanguageFromMimes, addBindings, monacoSettings };
