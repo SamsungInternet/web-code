@@ -62,6 +62,13 @@ main {
 	display: none;
 }
 
+.tab-content.image-container {
+	overflow: auto;
+	max-width: 100%;
+	min-width: 0;
+	width: 100px;
+}
+
 .tab-content.has-focus {
 	display: block;
 }
@@ -272,3 +279,4 @@ main {
     background: none;
 	color: grey;
 }
+

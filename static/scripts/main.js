@@ -75,7 +75,7 @@ function setUpScratch() {
 
 window.addEventListener('resize', function () {
 	var tab = tabController.getOpenTab();
-	if (tab) tab.editor.layout();
+	if (tab && tab.editor) tab.editor.layout();
 });
 
 setUpSideBar();
