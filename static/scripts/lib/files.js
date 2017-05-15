@@ -98,23 +98,29 @@ function openFile(stats) {
 		var newTab = tabController.newTab(stats);
 		tabController.focusTab(newTab);
 
-		return Promise.all([fs.readFile(stats.data.path, 'utf8'), monacoPromise])
-			.then(function (arr) {
-				return arr[0];
-			})
-			.then(function (fileContents) {
-				if (stats.data.mime.match(/^image/)) {
+		return monacoPromise
+			.then(function () {
+				if (stats.data.mime.match(/^image\//)) {
 					var image = document.createElement('img');
 					image.src = '/api/imageproxy?url=' + encodeURIComponent(stats.data.path);
 					newTab.contentEl.appendChild(image);
 					newTab.contentEl.classList.add('image-container');
+				} else if (stats.data.mime.match(/^video\//)) {
+					var video = document.createElement('video');
+					video.src = '/api/imageproxy?url=' + encodeURIComponent(stats.data.path);
+					newTab.contentEl.appendChild(video);
+					video.controls = true;
+					newTab.contentEl.classList.add('image-container');
 				} else {
-					var language = getMonacoLanguageFromMimes(stats.data.mime) || getMonacoLanguageFromExtensions(stats.data.extension);
-					newTab.editor = monaco.editor.create(newTab.contentEl, monacoSettings({
-						value: fileContents,
-						language: language
-					}));
-					addBindings(newTab.editor, newTab);
+					return fs.readFile(stats.data.path, 'utf8')
+					.then(function (fileContents) {
+						var language = getMonacoLanguageFromMimes(stats.data.mime) || getMonacoLanguageFromExtensions(stats.data.extension);
+						newTab.editor = monaco.editor.create(newTab.contentEl, monacoSettings({
+							value: fileContents,
+							language: language
+						}));
+						addBindings(newTab.editor, newTab);
+					});
 				}
 			})
 			.catch(function (e) {

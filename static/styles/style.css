@@ -60,6 +60,8 @@ main {
 .tab-content {
 	flex-grow: 1;
 	display: none;
+	background-color: var(--bg-head-color);
+	z-index: 1;
 }
 
 .tab-content.image-container {
@@ -140,6 +142,7 @@ main {
 	background-color: var(--bg-head-color);
 	color: white;
     align-items: center;
+	flex-shrink: 0;
 }
 
 #tools button {
@@ -225,6 +228,7 @@ main {
 	background-color: var(--bg-head-color);
 	padding-bottom: 6px;
 	margin-bottom: -6px;
+	flex-shrink: 0;
 }
 
 #logo {
