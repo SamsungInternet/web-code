@@ -55,6 +55,7 @@ main {
 	background: var(--file-list-bg);
 	color: var(--file-list-fg);
 	border-top-right-radius: 1em;
+	min-height: 5em;
 }
 
 .tab-content {
@@ -103,6 +104,7 @@ main {
 	transition: transform 0.5s ease;
 	display: flex;
 	padding: 0.5em;
+	z-index: 2;
 	flex-direction: column;
 }
 
