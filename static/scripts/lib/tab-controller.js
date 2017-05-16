@@ -4,10 +4,10 @@
 
 import state from './state.js';
 import { updateDBDoc } from './db.js';
-import fs from './fs-proxy.js';
 import Stats from './web-code-stats.js'
 import renderFileList from './render-file-list.js';
-import { newFile } from './newFile.js';
+import { saveTextFileFromEditor } from './files.js';
+import BufferFile from './buffer-file.js';
 
 function saveOpenTab() {
 	var tab = tabController.getOpenTab();
@@ -17,12 +17,7 @@ function saveOpenTab() {
 	} else {
 		return;
 	}
-	var altId = tab.editor.model.getAlternativeVersionId();
-	fs.writeFile(stats.data.path, tab.editor.getValue())
-	.then(function () {
-		tab.editor.webCodeState.savedAlternativeVersionId = altId;
-		tab.editor.webCodeState.functions.checkForChanges();
-	});
+	saveTextFileFromEditor(stats, tab.editor);
 }
 
 function closeOpenTab() {
@@ -57,28 +52,20 @@ var tabController = (function setUpTabs() {
 			this.el.textContent = stats.data.name;
 			this.el.tabIndex = 0;
 			addCloseButton = true;
-		} else if (stats.name) {
-			/* It is a custom tab with
-				{
-					name,
-					icon,
-					mime,
-					hasCloseButton [bool]
-				}
-			*/
+		} else if (stats.constructor === BufferFile) {
 			this.stats = stats;
 			this.el = document.createElement('a');
 			this.el.classList.add('tab');
-			this.el.dataset.name = stats.name;
-			this.el.textContent = stats.name;
-			if (stats.icon) {
+			this.el.dataset.name = stats.data.name;
+			this.el.textContent = stats.data.name;
+			if (stats.data.icon) {
 				this.el.classList.add('has-icon');
-				this.el.dataset.icon = stats.icon;
+				this.el.dataset.icon = stats.data.icon;
 			}
-			if (stats.mime) {
-				this.el.dataset.mime = stats.mime;
+			if (stats.data.mime) {
+				this.el.dataset.mime = stats.data.mime;
 			}
-			if (stats.hasCloseButton !== false) {
+			if (stats.data.hasTabCloseButton !== false) {
 				addCloseButton = true;
 			}
 			this.el.tabIndex = 0;
@@ -88,7 +75,7 @@ var tabController = (function setUpTabs() {
 
 			this.closeEl = document.createElement('button');
 			this.closeEl.classList.add('tab_close');
-			this.closeEl.setAttribute('aria-label', 'Close Tab ' + stats.name || stats.data.name);
+			this.closeEl.setAttribute('aria-label', 'Close Tab ' + stats.data.name);
 			this.el.appendChild(this.closeEl);
 			this.closeEl.tabIndex = 0;
 
@@ -181,7 +168,7 @@ var tabController = (function setUpTabs() {
 		if (!state.currentlyOpenedPath) return;
 		updateDBDoc('OPEN_TABS_FOR_' + state.currentlyOpenedPath, {
 			open_tabs: Array.from(this.currentlyOpenFilesMap.keys()).map(function (stats) {
-				return stats.constructor === Stats ? stats.toDoc() : stats;
+				return stats.toDoc();
 			})
 		})
 		.catch(function (err) {

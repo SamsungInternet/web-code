@@ -2,8 +2,10 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-import { saveOpenTab, closeOpenTab } from './tab-controller';
-import { promptForOpen } from './files';
+import { closeOpenTab } from './tab-controller.js';
+import { promptForOpen, saveTextFileFromEditor } from './files.js';
+import BufferFile from './buffer-file.js'
+import debounce from 'lodash.debounce';
 
 var settings = {
 	theme: 'web-code',
@@ -105,7 +107,20 @@ function addBindings(editor, tab) {
 		}
 	}
 
-	editor.onDidChangeModelContent(editor.webCodeState.functions.checkForChanges);
+	var writeToDB = debounce(function writeToDB() {
+		if (tab.stats.constructor === BufferFile) {
+			tab.stats.update(editor.getValue()).then(function () {
+				editor.webCodeState.savedAlternativeVersionId = editor.model.getAlternativeVersionId();
+				editor.webCodeState.functions.checkForChanges();
+			});
+		}
+	}, 500);
+
+	editor.onDidChangeModelContent(function () {
+		writeToDB();
+		editor.webCodeState.functions.checkForChanges();
+	});
+
 	editor.onDidFocusEditor(function () {
 		editor.webCodeState.hasJustTabbedIn.set(true);
 	});
@@ -120,7 +135,9 @@ function addBindings(editor, tab) {
 		keybindingContext: null,
 		contextMenuGroupId: 'navigation',
 		contextMenuOrder: 1.5,
-		run: saveOpenTab
+		run: function () {
+			saveTextFileFromEditor(tab.stats, editor);
+		}
 	});
 }
 

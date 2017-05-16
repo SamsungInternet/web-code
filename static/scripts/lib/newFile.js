@@ -4,18 +4,24 @@
 
 import { tabController } from './tab-controller.js';
 import { monacoPromise, monacoSettings, addBindings } from './monaco.js';
+import BufferFile from './buffer-file.js';
 
 // Until they are saved new files are kept in a buffer
 // Saved on changes to the db when saved to disk they are removed from the DB
 function newFile() {
-	var tab = tabController.newTab({
+	var bf = new BufferFile ({
 		name: 'New File',
-		icon: 'buffer'
+		icon: 'buffer',
+		id: Date.now() + '__' + 'New File'
 	});
-	monacoPromise
-		.then(function () {
-			tab.editor = monaco.editor.create(tab.contentEl, monacoSettings());
+	var tab = tabController.newTab(bf);
+	Promise.all([monacoPromise, bf.valuePromise])
+		.then(function (arr) {
+			tab.editor = monaco.editor.create(tab.contentEl, monacoSettings({
+				value: arr[1]
+			}));
 			addBindings(tab.editor, tab);
+			tabController.focusTab(tab);
 		})
 		.catch(function (e) {
 			console.log(e.message);	
@@ -30,10 +36,10 @@ function newFile() {
 //
 // Saving it makes a new file but launches a new empty scratch
 function setUpScratch() {
-	var tab = tabController.newTab({
+	var tab = tabController.newTab(new BufferFile ({
 		name: 'Scratchpad',
 		icon: 'buffer'
-	});
+	}));
 
 	// Puts new tab at the start rest get moved after it
 	tabController.setOrder([
@@ -51,6 +57,6 @@ function setUpScratch() {
 }
 
 export {
-    newFile,
-    setUpScratch
+	newFile,
+	setUpScratch
 }

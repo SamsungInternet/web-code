@@ -257,6 +257,9 @@ main {
 	padding-bottom: 6px;
 	margin-bottom: -6px;
 	flex-shrink: 0;
+	position: relative;
+    overflow: hidden;
+    height: calc(2.5em + 6px);
 }
 
 #logo {

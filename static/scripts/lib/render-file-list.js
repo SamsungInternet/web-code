@@ -2,7 +2,8 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
-import Stats from './web-code-stats';
+import Stats from './web-code-stats.js';
+import BufferFile from './buffer-file.js';
 
 function renderFileList(el, array, options) {
 
@@ -66,14 +67,14 @@ function renderFileList(el, array, options) {
 					stats.renderFileList(newFileList, useOptions);
 				}
 			}
-		} else {
-			li.dataset.name = stats.name;
-			li.textContent = stats.name;
-			if (stats.icon) {
+		} else if (stats.constructor === BufferFile) {
+			li.dataset.name = stats.data.name;
+			li.textContent = stats.data.name;
+			if (stats.data.icon) {
 				li.classList.add('has-icon');
 				li.dataset.icon = stats.icon;
 			}
-			if (stats.mime) {
+			if (stats.data.mime) {
 				li.dataset.mime = stats.mime;
 			}
 		}

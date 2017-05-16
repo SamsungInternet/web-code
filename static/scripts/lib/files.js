@@ -4,6 +4,7 @@
 
 import fs from './fs-proxy.js';
 import Stats from './web-code-stats.js';
+import BufferFile from './buffer-file.js';
 import state from './state.js';
 import { db, updateDBDoc } from './db.js';
 import { tabController } from './tab-controller.js';
@@ -49,12 +50,17 @@ function openPath(stats) {
 			// Then open the saved tabs from last time
 			db.get('OPEN_TABS_FOR_' + stats.data.path).then(function (tabs) {
 				Promise.all(tabs.open_tabs.map(function (obj) {
-					if (!obj.path) return null;
-					return Stats.fromPath(obj.path)
-					.catch(function (e) {
-						console.log(e.message);
-						return null;
-					});
+					if (obj.__webStatDoc) {
+						return Stats.fromPath(obj.path)
+						.catch(function (e) {
+							console.log(e.message);
+							return null;
+						});
+					}
+					if (obj.isBufferFileDoc) {
+						return new BufferFile(obj);
+					}
+					return null;
 				})).then(function (statsArray) {
 					statsArray.filter(function (a) {
 						return a !== null;
@@ -98,7 +104,7 @@ function openFile(stats) {
 		var newTab = tabController.newTab(stats);
 		tabController.focusTab(newTab);
 
-		return monacoPromise
+		if (stats.constructor === Stats) return monacoPromise
 			.then(function () {
 				if (stats.data.mime.match(/^image\//)) {
 					var image = document.createElement('img');
@@ -126,6 +132,20 @@ function openFile(stats) {
 			.catch(function (e) {
 				console.log(e.message);	
 			});
+
+		if (stats.constructor === BufferFile) {
+			Promise.all([monacoPromise, stats.valuePromise]).then(function (arr) {
+				return arr[1];
+			})
+			.then(function (value) {
+				var language = getMonacoLanguageFromMimes(stats.data.mime) || getMonacoLanguageFromExtensions(stats.data.extension);
+				newTab.editor = monaco.editor.create(newTab.contentEl, monacoSettings({
+					value: value,
+					language: language
+				}));
+				addBindings(newTab.editor, newTab);
+			});
+		}
 	}
 }
 
@@ -146,11 +166,29 @@ function smartOpen(path) {
 	});
 }
 
+
+// Saves file and updates versions for changes
+function saveTextFileFromEditor(stats, editor) {
+	if (stats.constructor === Stats) {
+		var altId = editor.model.getAlternativeVersionId();
+		fs.writeFile(stats.data.path, editor.getValue())
+		.then(function () {
+			editor.webCodeState.savedAlternativeVersionId = altId;
+			editor.webCodeState.functions.checkForChanges();
+		});
+	} else if (stats.constructor === BufferFile) {
+		console.log('STUB: Save As for:', stats);
+	} else {
+		throw Error('Not a FileStats or FileBuffer');
+	}
+}
+
 export {
 	populateFileList,
 	openFile,
 	openPath,
 	promptForOpen,
 	smartOpen,
-	destroyFileList
+	destroyFileList,
+	saveTextFileFromEditor
 };
