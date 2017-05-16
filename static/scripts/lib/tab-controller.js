@@ -7,6 +7,7 @@ import { updateDBDoc } from './db.js';
 import fs from './fs-proxy.js';
 import Stats from './web-code-stats.js'
 import renderFileList from './render-file-list.js';
+import { newFile } from './newFile.js';
 
 function saveOpenTab() {
 	var tab = tabController.getOpenTab();
@@ -77,7 +78,7 @@ var tabController = (function setUpTabs() {
 			if (stats.mime) {
 				this.el.dataset.mime = stats.mime;
 			}
-			if (stats.hasCloseButton) {
+			if (stats.hasCloseButton !== false) {
 				addCloseButton = true;
 			}
 			this.el.tabIndex = 0;
@@ -87,7 +88,7 @@ var tabController = (function setUpTabs() {
 
 			this.closeEl = document.createElement('button');
 			this.closeEl.classList.add('tab_close');
-			this.closeEl.setAttribute('aria-label', 'Close Tab ' + stats.data.name);
+			this.closeEl.setAttribute('aria-label', 'Close Tab ' + stats.name || stats.data.name);
 			this.el.appendChild(this.closeEl);
 			this.closeEl.tabIndex = 0;
 
@@ -114,6 +115,7 @@ var tabController = (function setUpTabs() {
 
 	function TabController() {
 		this.currentlyOpenFilesMap = new Map();
+		this.focusedTab = null;
 	}
 
 	TabController.prototype.hasTab = function (stats) {
@@ -129,6 +131,11 @@ var tabController = (function setUpTabs() {
 		this.currentlyOpenFilesMap.set(stats, tab);
 		updateOpenFileEl();
 		this.storeOpenTabs();
+
+		if (!this.focusedTab) {
+			this.focusTab(tab);
+		}
+
 		return tab;
 	}
 
@@ -146,14 +153,21 @@ var tabController = (function setUpTabs() {
 		var tab = stats.constructor === Tab ? stats : this.currentlyOpenFilesMap.get(stats);
 		var tabState = Array.from(this.currentlyOpenFilesMap.values());
 		var tabIndex = tabState.indexOf(tab);
-		var nextTab = tabState[Math.max(0, tabIndex - 1)];
+		var nextTab = (tabIndex >= 1) ? tabState[tabIndex - 1] : tabState[tabIndex + 1] ;
+
 		this.currentlyOpenFilesMap.delete(tab.stats);
 		tab.destroy();
 		updateOpenFileEl();
 		this.storeOpenTabs();
-		if (this.focusedTab === tab && nextTab) {
+		if (this.focusedTab === tab && nextTab) {	
 			this.focusTab(nextTab);
 		}
+		if (this.focusedTab === tab) {
+			this.focusedTab = null;
+		}
+		// if (this.currentlyOpenFilesMap.size === 0) {
+		// 	newFile();
+		// }
 	}
 
 	TabController.prototype.closeAll = function () {

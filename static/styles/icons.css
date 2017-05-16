@@ -52,9 +52,15 @@ button[data-action="up-dir"]:before {
 	font-size: 2em;
 }
 
+
  .has-icon:before {
 	font-family: "FontAwesome";
 	content: "\f15b";
+ }
+
+ .has-icon[data-icon="buffer"]:before {
+	font-family: "Devicons";
+	content: "\E606";
  }
 
  .has-icon[data-mime="directory"]:before {

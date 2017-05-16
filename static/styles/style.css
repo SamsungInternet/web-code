@@ -38,7 +38,33 @@ main {
 #container {
 	flex-grow: 1;
 	display: flex;
-	background: white;
+	background: var(--bg-head-color);
+	position: relative;
+}
+
+#container:empty {
+	align-content: center;
+	align-items: center;
+}
+
+@keyframes fade-in {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+#container:empty:before {
+	content: 'Welcome to Web Code.';
+	font-size: calc(15vw - 20px);
+	color: rgba(255, 255, 255, 0.4);
+	text-align: center;
+	opacity: 0;
+	animation: fade-in 2s ease;
+	animation-fill-mode: forwards;
+	animation-delay: 500ms;
 }
 
 #directory {
