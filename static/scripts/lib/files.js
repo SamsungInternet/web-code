@@ -150,7 +150,10 @@ function openFile(stats) {
 }
 
 function promptForOpen() {
-	return openFileDialog(state.currentlyOpenedPath || process.env.HOME || '/').then(openPath);
+	return openFileDialog({
+		path: state.currentlyOpenedPath || process.env.HOME || '/',
+		role: 'open'
+	}).then(openPath);
 }
 
 function smartOpen(path) {
@@ -177,7 +180,13 @@ function saveTextFileFromEditor(stats, editor) {
 			editor.webCodeState.functions.checkForChanges();
 		});
 	} else if (stats.constructor === BufferFile) {
-		console.log('STUB: Save As for:', stats);
+		openFileDialog({
+			path: state.currentlyOpenedPath || process.env.HOME || '/',
+			role: 'save as',
+			filename: stats.data.name
+		}).then(function (path) {
+			console.log(path);	
+		});
 	} else {
 		throw Error('Not a FileStats or FileBuffer');
 	}

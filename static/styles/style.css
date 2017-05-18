@@ -8,12 +8,12 @@ body, html {
 	height: 100%;
 	overflow: hidden;
 	font-family: "Samsung One", "Helvetica Neue", "Calibri Light", Roboto, Helvetica, sans-serif;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    letter-spacing: 0.02em;
-    font-size: 16px;
-    color: #333;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	letter-spacing: 0.02em;
+	font-size: 16px;
+	color: #333;
 	--bg-head-color: #333;
 	--file-list-bg: #555;
 	--file-list-fg: white;
@@ -124,22 +124,32 @@ main {
 	background: white;
 	box-shadow: 0 0 3em -0.5em black;
 	position: absolute;
-	left: 50%;
 	top: 1em;
-	transform: translateX(-50%);
 	transition: transform 0.5s ease;
 	display: flex;
 	padding: 0.5em;
 	z-index: 2;
 	flex-direction: column;
+	left: calc(50vw - 400px);
+}
+
+
+#file-open-widget .filelist {
+	min-width: 40%;
+}
+
+@media screen and (max-width: 1200px) {
+	#file-open-widget {
+		left: 16vw;
+	}
 }
 
 #file-open-widget.closed {
-	transform: translateX(-50%) translateY(-100%) translateY(-3em);
+	transform: translateY(-100%) translateY(-3em);
 	visibility: hidden;
 }
 
-#file-open-widget input[name="current-path"] {
+#file-open-widget input[type="text"] {
 	flex-grow: 1;
 	font-size: 1em;
 	padding-left: 0.3em;
@@ -154,40 +164,72 @@ main {
 }
 
 #file-open-widget .buttons #file-open-open {
+	display: none;
 	filter: brightness(0.8) sepia(1) hue-rotate(50deg);
+}
+
+#file-open-widget[data-role="open"] .buttons #file-open-open {
+	display: inline;
+}
+
+#file-open-widget .buttons #file-open-save {
+	display: none;
+	filter: brightness(0.8) sepia(1) hue-rotate(50deg);
+}
+
+#file-open-widget[data-role="save-as"] .buttons #file-open-save {
+	display: inline;
+}
+
+#file-open-widget #save-file-name {
+	display: inline;
+}
+
+#file-open-widget[data-role="save"] #save-file-name {
+	display: inline;
 }
 
 .file-open-widget_tools {
 	display: flex;
-	flex-direction: row;
-	margin-bottom: 0.5em;
+	margin-bottom: 0.25em;
 	flex-shrink: 0;
 }
+
+#file-open-widget .file-save-widget_tools {
+	display: none;
+	margin-bottom: 0.25em;
+	flex-shrink: 0;
+}
+
+#file-open-widget[data-role="save-as"] .file-save-widget_tools {
+	display: flex;
+}
+
 
 #tools {
 	display: flex;
 	padding: 0.5em;
 	background-color: var(--bg-head-color);
 	color: white;
-    align-items: center;
+	align-items: center;
 	flex-shrink: 0;
 }
 
 #tools button {
 	font-size: 1.5em;
-    width: 1.3em;
-    height: 1.3em;
-    padding: 0;
-    text-align: center;
-    vertical-align: middle;
+	width: 1.3em;
+	height: 1.3em;
+	padding: 0;
+	text-align: center;
+	vertical-align: middle;
 	cursor: pointer;
 	color: black;
 }
 
 #tools button:not(:hover):not(:focus) {
-    -webkit-appearance: none;
-    border: 0;
-    background: none;
+	-webkit-appearance: none;
+	border: 0;
+	background: none;
 	color: #ddd;
 }
 
@@ -214,11 +256,11 @@ main {
 
 .filelist:before {
 	content: attr(data-name);
-    padding-left: 0.25em;
-    background-color: var(--bg-head-color);
-    color: white;
-    display: block;
-    border-bottom: 3px solid grey;
+	padding-left: 0.25em;
+	background-color: var(--bg-head-color);
+	color: white;
+	display: block;
+	border-bottom: 3px solid grey;
 }
 
 .filelist .filelist:before {
@@ -258,8 +300,8 @@ main {
 	margin-bottom: -6px;
 	flex-shrink: 0;
 	position: relative;
-    overflow: hidden;
-    height: calc(2.5em + 6px);
+	overflow: hidden;
+	height: calc(2.5em + 6px);
 }
 
 #logo {
@@ -271,13 +313,13 @@ main {
 
 .tab {
 	padding: 0.5em;
-    display: inline-block;
-    border-style: solid;
-    border-width: 0;
-    background-color: lightgray;
-    border-color: lightseagreen;
+	display: inline-block;
+	border-style: solid;
+	border-width: 0;
+	background-color: lightgray;
+	border-color: lightseagreen;
 	border-right-width: 1px;
-    border-top-width: 3px;
+	border-top-width: 3px;
 	transform: translateY(3px);
 	transition: transform 0.5s ease;
 	cursor: pointer;
@@ -299,19 +341,19 @@ main {
 }
 
 .tab .tab_close {
-    margin-left: 0.5em;
-    width: 1.3rem;
-    height: 1.3rem;
-    padding: 0;
-    text-align: center;
-    vertical-align: middle;
+	margin-left: 0.5em;
+	width: 1.3rem;
+	height: 1.3rem;
+	padding: 0;
+	text-align: center;
+	vertical-align: middle;
 	cursor: pointer;
 }
 
 .tab .tab_close:not(:hover):not(:focus) {
-    -webkit-appearance: none;
-    border: 0;
-    background: none;
+	-webkit-appearance: none;
+	border: 0;
+	background: none;
 	color: grey;
 }
 

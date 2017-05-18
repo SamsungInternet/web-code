@@ -2,6 +2,8 @@
 /* eslint no-var: 0, no-console: 0 */
 /* eslint-env es6 */
 
+/* NEEDS REFACTORING */
+
 import { populateFileList, destroyFileList } from './files';
 import Stats from './web-code-stats';
 import { resolve, join } from 'path';
@@ -11,14 +13,36 @@ var currentPath;
 var resolver;
 var rejecter;
 
-function openFileDialog(path) {
+function openFileDialog(options) {
 
 	return new Promise(function (resolve, reject) {
+
+		var role;
+
+		if (typeof options !== 'object') {
+			throw Error('Invalid options object')
+		}
+
+		if (!options.role) {
+			throw Error('Role not defined');
+		}
+
+		if (options.role.toLowerCase() === 'open') {
+			role = 'open';
+		} else if (options.role.toLowerCase() === 'save as') {
+			role = 'save-as';
+		} else {
+			throw Error('Unrecognised role, ' + options.role);
+		}
+		
 		if (openFileDialog.open === undefined) openFileDialog.open = false;
 		if (openFileDialog.open === true) {
 			throw Error('Dialog already open for another task.');
 		}
-		path = path || process.env.HOME || '/';
+
+		openFileDialog.el.dataset.role = role;
+
+		var path = options.path || process.env.HOME || '/';
 		currentPath = path;
 		openFileDialog.el.classList.remove('closed');
 		openFileDialog.el.querySelector('a, button, [tabindex]').focus();
