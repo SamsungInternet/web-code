@@ -136,6 +136,11 @@ var tabController = (function setUpTabs() {
 		if (focusedTab.editor) focusedTab.editor.layout();
 	}
 
+	TabController.prototype.getTabFromKey = function (stats) {
+		var tab = stats.constructor === Tab ? stats : this.currentlyOpenFilesMap.get(stats);
+		return tab;
+	}
+
 	TabController.prototype.closeTab = function (stats) {
 		var tab = stats.constructor === Tab ? stats : this.currentlyOpenFilesMap.get(stats);
 		var tabState = Array.from(this.currentlyOpenFilesMap.values());
@@ -176,11 +181,15 @@ var tabController = (function setUpTabs() {
 		});
 	}
 
+	TabController.prototype.getTabsAsArray = function () {
+		return Array.from(tabsEl.children);
+	}
+
 	/**
 	 * All the elements in the array are moved to the start in the order they appear.
 	 */
 	TabController.prototype.setOrder= function(arr) {
-		var old = new Set(tabsEl.children);
+		var old = new Set(this.getTabsAsArray());
 		tabsEl.innerHTML = '';
 		arr.forEach(function (el) {
 			if (el.constructor === Tab) {

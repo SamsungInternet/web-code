@@ -115,7 +115,7 @@ main {
 	flex-direction: column;
 }
 
-#file-open-widget {
+#file-dialog-widget {
 	min-width: 300px;
 	width: 66%;
 	max-width: 800px;
@@ -134,74 +134,60 @@ main {
 }
 
 
-#file-open-widget .filelist {
+#file-dialog-widget .filelist {
 	min-width: 40%;
 }
 
 @media screen and (max-width: 1200px) {
-	#file-open-widget {
+	#file-dialog-widget {
 		left: 16vw;
 	}
 }
 
-#file-open-widget.closed {
+#file-dialog-widget.closed {
 	transform: translateY(-100%) translateY(-3em);
 	visibility: hidden;
 }
 
-#file-open-widget input[type="text"] {
+#file-dialog-widget input[type="text"] {
 	flex-grow: 1;
 	font-size: 1em;
 	padding-left: 0.3em;
 }
 
-#file-open-widget .buttons {
+#file-dialog-widget .buttons {
 	text-align: right;
 }
 
-#file-open-widget .buttons button {
+#file-dialog-widget .buttons button {
 	font-size: 1.3em;
 }
 
-#file-open-widget .buttons #file-open-open {
-	display: none;
+#file-dialog-widget .buttons #file-dialog-submit {
 	filter: brightness(0.8) sepia(1) hue-rotate(50deg);
 }
 
-#file-open-widget[data-role="open"] .buttons #file-open-open {
+#file-dialog-widget #save-file-name {
 	display: inline;
 }
 
-#file-open-widget .buttons #file-open-save {
-	display: none;
-	filter: brightness(0.8) sepia(1) hue-rotate(50deg);
-}
-
-#file-open-widget[data-role="save-as"] .buttons #file-open-save {
+#file-dialog-widget[data-role="save"] #save-file-name {
 	display: inline;
 }
 
-#file-open-widget #save-file-name {
-	display: inline;
-}
-
-#file-open-widget[data-role="save"] #save-file-name {
-	display: inline;
-}
-
-.file-open-widget_tools {
+.file-dialog-widget_tools {
 	display: flex;
 	margin-bottom: 0.25em;
 	flex-shrink: 0;
 }
 
-#file-open-widget .file-save-widget_tools {
+#file-dialog-widget .file-save-widget_tools {
 	display: none;
 	margin-bottom: 0.25em;
 	flex-shrink: 0;
 }
 
-#file-open-widget[data-role="save-as"] .file-save-widget_tools {
+#file-dialog-widget[data-role="save-as"] .file-save-widget_tools {
 	display: flex;
 }
 
@@ -234,14 +220,14 @@ main {
 }
 
 
-#file-open-widget .file-selectors {
+#file-dialog-widget .file-selectors {
 	flex-grow: 1;
 	display: flex;
 	flex-direction: row;
 	margin-bottom: 0.5em;
 }
 
-#file-open-widget .file-selectors .filelist:first-child {
+#file-dialog-widget .file-selectors .filelist:first-child {
 	margin-right: 0.5em;
 }
 

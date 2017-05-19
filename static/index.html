@@ -28,23 +28,22 @@
 	</div>
 </main>
 
-<div id="file-open-widget" class="closed">
+<div id="file-dialog-widget" class="closed">
 	<div class="file-save-widget_tools">
 		<label for="save-file-name">File Name&nbsp;</label>
 		<input type="text" aria-label="New file name" id="save-file-name"></input>
 	</div>
-	<div class="file-open-widget_tools">
-		<button tabindex="0" aria-label="Up Directory" data-action="up-dir"></button>
+	<div class="file-dialog-widget_tools">
 		<input type="text" aria-label="File selector widget path" name="current-path"></input>
+		<button tabindex="0" aria-label="Up Directory" data-action="up-dir"></button>
 	</div>
 	<div class="file-selectors">
 		<ul class="filelist"></ul>
 		<ul class="filelist"></ul>
 	</div>
 	<div class="buttons">
-		<button id="file-open-cancel" tabindex="0">Cancel</button>
-		<button id="file-open-open" tabindex="0">Open</button>
-		<button id="file-open-save" tabindex="0">Save</button>
+		<button id="file-dialog-cancel" tabindex="0">Cancel</button>
+		<button id="file-dialog-submit" tabindex="0"></button>
 	</div>
 </div>
 

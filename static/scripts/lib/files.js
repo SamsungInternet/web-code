@@ -9,7 +9,7 @@ import state from './state.js';
 import { db, updateDBDoc } from './db.js';
 import { tabController } from './tab-controller.js';
 import { monacoPromise, getMonacoLanguageFromExtensions, getMonacoLanguageFromMimes, addBindings, monacoSettings } from './monaco.js';
-import openFileDialog from './open-file-dialog.js';
+import fileDialog from './file-dialog.js';
 
 function populateFileList(el, path, options) {
 	el.path = path;
@@ -96,6 +96,11 @@ function openPath(stats) {
 	}
 }
 
+/**
+ * returns a promise which resolves a Tab
+ * 
+ * @param {Stats|FileBuffer} stats 
+ */
 function openFile(stats) {
 
 	if (tabController.hasTab(stats)) {
@@ -111,12 +116,14 @@ function openFile(stats) {
 					image.src = '/api/imageproxy?url=' + encodeURIComponent(stats.data.path);
 					newTab.contentEl.appendChild(image);
 					newTab.contentEl.classList.add('image-container');
+					return newTab;
 				} else if (stats.data.mime.match(/^video\//)) {
 					var video = document.createElement('video');
 					video.src = '/api/imageproxy?url=' + encodeURIComponent(stats.data.path);
 					newTab.contentEl.appendChild(video);
 					video.controls = true;
 					newTab.contentEl.classList.add('image-container');
+					return newTab;
 				} else {
 					return fs.readFile(stats.data.path, 'utf8')
 					.then(function (fileContents) {
@@ -126,6 +133,7 @@ function openFile(stats) {
 							language: language
 						}));
 						addBindings(newTab.editor, newTab);
+						return newTab;
 					});
 				}
 			})
@@ -134,7 +142,7 @@ function openFile(stats) {
 			});
 
 		if (stats.constructor === BufferFile) {
-			Promise.all([monacoPromise, stats.valuePromise]).then(function (arr) {
+			return Promise.all([monacoPromise, stats.valuePromise]).then(function (arr) {
 				return arr[1];
 			})
 			.then(function (value) {
@@ -144,13 +152,14 @@ function openFile(stats) {
 					language: language
 				}));
 				addBindings(newTab.editor, newTab);
+				return newTab;
 			});
 		}
 	}
 }
 
 function promptForOpen() {
-	return openFileDialog({
+	return fileDialog({
 		path: state.currentlyOpenedPath || process.env.HOME || '/',
 		role: 'open'
 	}).then(openPath);
@@ -174,18 +183,42 @@ function smartOpen(path) {
 function saveTextFileFromEditor(stats, editor) {
 	if (stats.constructor === Stats) {
 		var altId = editor.model.getAlternativeVersionId();
-		fs.writeFile(stats.data.path, editor.getValue())
+		return fs.writeFile(stats.data.path, editor.getValue())
 		.then(function () {
 			editor.webCodeState.savedAlternativeVersionId = altId;
 			editor.webCodeState.functions.checkForChanges();
 		});
 	} else if (stats.constructor === BufferFile) {
-		openFileDialog({
+		return fileDialog({
 			path: state.currentlyOpenedPath || process.env.HOME || '/',
 			role: 'save as',
 			filename: stats.data.name
 		}).then(function (path) {
-			console.log(path);	
+			return fs.writeFile(path, editor.getValue())
+			.then(function () {
+				editor.webCodeState.savedAlternativeVersionId = altId;
+				editor.webCodeState.functions.checkForChanges();
+				return Stats.fromPath(path);
+			})
+			.then(function (newStats) {
+				var tabs = tabController.getTabsAsArray();
+				var oldTab = tabController.getTabFromKey(stats);
+				var index = tabs.indexOf(oldTab);
+				var newTab = tabs[index] = tabController.newTab(newStats);
+				tabController.closeTab(stats);
+				tabController.setOrder(tabs);
+				return fs.readFile(newStats.data.path, 'utf8')
+				.then(function (fileContents) {
+					var language = getMonacoLanguageFromMimes(stats.data.mime) || getMonacoLanguageFromExtensions(stats.data.extension);
+					newTab.editor = monaco.editor.create(newTab.contentEl, monacoSettings({
+						value: fileContents,
+						language: language
+					}));
+					addBindings(newTab.editor, newTab);
+					tabController.focusTab(newTab);
+					return newTab;
+				});
+			});
 		});
 	} else {
 		throw Error('Not a FileStats or FileBuffer');
