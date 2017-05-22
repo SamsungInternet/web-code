@@ -27,12 +27,12 @@
     "monaco": "^1.201704190613.0",
     "monaco-editor": "^0.8.3",
     "napa": "^2.3.0",
-    "ws": "^2.3.1"
+    "ws": "^2.3.1",
+    "axe-core": "^2.2.0",
+    "pouchdb-browser": "^6.2.0"
   },
   "devDependencies": {
-    "axe-core": "^2.2.0",
     "nodemon": "^1.11.0",
-    "pouchdb-browser": "^6.2.0",
     "rollup": "^0.41.6",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-json": "^2.1.1",
