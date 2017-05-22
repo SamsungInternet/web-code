@@ -32,7 +32,11 @@ var fs = {};
 	'stat',
 	'readFile',
 	'writeFile',
-	'readdir'
+	'readdir',
+	'mkdir',
+	'rename',
+	'unlink',
+	'rmdir'
 ].forEach(function (cmd) {
 	fs[cmd] = fsProxy(cmd);
 });

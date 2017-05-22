@@ -62,6 +62,10 @@ lockFile.lock('web-code.lock', {}, function (err) {
 		maxAge: 3600 * 1000 * 24
 	}));
 
+	app.use('/contextmenu/', express.static(__dirname + '/node_modules/contextmenu/', {
+		maxAge: 3600 * 1000 * 24
+	}));
+
 	app.use('/fira/', express.static(__dirname + '/node_modules/FiraCode/distr', {
 		maxAge: 3600 * 1000 * 24
 	}));

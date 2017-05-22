@@ -21,6 +21,7 @@
     "axe-core": "^2.2.0",
     "body-parser": "^1.17.1",
     "chokidar": "^1.7.0",
+    "contextmenu": "github:aantthony/contextmenu",
     "express": "^4.15.2",
     "file-icons": "git+https://github.com/file-icons/atom.git",
     "lockfile": "^1.0.3",
@@ -33,6 +34,7 @@
     "ws": "^2.3.1"
   },
   "devDependencies": {
+    "dom-delegate": "^2.0.3",
     "nodemon": "^1.11.0",
     "rollup": "^0.41.6",
     "rollup-plugin-commonjs": "^8.0.2",

@@ -133,8 +133,6 @@ function addBindings(editor, tab) {
 		label: 'Save File',
 		keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S],
 		keybindingContext: null,
-		contextMenuGroupId: 'navigation',
-		contextMenuOrder: 1.5,
 		run: function () {
 			saveTextFileFromEditor(tab.stats, editor);
 		}
