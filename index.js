@@ -72,29 +72,52 @@ lockFile.lock('web-code.lock', {}, function (err) {
 
 	app.use('/api/', api);
 
+	function heartbeat() {
+		this.isAlive = true;
+	}
+
+	setInterval(function ping() {
+		wss.clients.forEach(function each(ws) {
+			if (ws.isAlive === false) return ws.terminate();
+
+			ws.isAlive = false;
+			ws.ping('', false, true);
+		});
+	}, 5000);
+
 	wss.on('connection', function connection(ws) {
 		ws.on('message', wsMessaging.wsRouting);
 
 		ws.webCodeClient = new Client();
-		ws.webCodeClient.on('change', function (stats) {
-			ws.send(JSON.stringify(['FS_CHANGE', null, stats.toDoc()]));
+		ws.webCodeClient.on('change', function fn(stats) {
+			ws.send(JSON.stringify(['FS_CHANGE', null, stats.toDoc()]), e => console.log(e));
 		});
-		ws.webCodeClient.on('add', function (stats) {
-			ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]));
+		ws.webCodeClient.on('add', function fn(stats) {
+			ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]), e => console.log(e));
 		});
-		ws.webCodeClient.on('unlink', function (obj) {
-			ws.send(JSON.stringify(['FS_UNLINK', null, obj]));
+		ws.webCodeClient.on('unlink', function fn(obj) {
+			ws.send(JSON.stringify(['FS_UNLINK', null, obj]), e => console.log(e));
 		});
-		ws.webCodeClient.on('addDir', function (stats) {
-			ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]));
+		ws.webCodeClient.on('addDir', function fn(stats) {
+			ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]), e => console.log(e));
 		});
-		ws.webCodeClient.on('unlinkDir', function (obj) {
-			ws.send(JSON.stringify(['FS_UNLINK', null, obj]));
+		ws.webCodeClient.on('unlinkDir', function fn(obj) {
+			ws.send(JSON.stringify(['FS_UNLINK', null, obj]), e => console.log(e));
 		});
+
+		ws.on('close', function close() {
+			ws.webCodeClient.destroy();
+			ws.webCodeClient = null;
+			console.log('disconnected');
+		});
+
+		ws.isAlive = true;
+		ws.on('pong', heartbeat);
 
 		ws.send(wsMessaging.wsSendFormat('HANDSHAKE', {
 			path: lastWorkingDir || false
 		}));
+
 	});
 
 	server.on('request', app);
@@ -102,7 +125,9 @@ lockFile.lock('web-code.lock', {}, function (err) {
 	/* eslint no-console: 0 */
 		console.log('Server running with PID:', process.pid);
 		console.log('Open up: http://127.0.0.1:' + server.address().port);
-		exec('termux-open-url http://127.0.0.1:' + server.address().port, puts);
+
+		// if an address is set to open then do otherwise just run the server
+		if (lastWorkingDir) exec('termux-open-url http://127.0.0.1:' + server.address().port, puts);
 	});
 
 	function exit(code) {
@@ -124,6 +149,8 @@ lockFile.lock('web-code.lock', {}, function (err) {
 		console.log('Updating working dir to', lastWorkingDir);
 
 		// Opening a new browser tab to that location.
+		// STUB: Here we should see if the path is within an existing window
+		// in that case open it.
 		exec('termux-open-url http://127.0.0.1:' + server.address().port, puts);
 	});
 

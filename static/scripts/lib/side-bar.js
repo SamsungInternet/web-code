@@ -6,6 +6,7 @@ import { populateFileList, destroyFileList, openFile } from './files.js';
 import { join } from 'path';
 import fs from './fs-proxy.js';
 import Stats from './web-code-stats.js';
+import { displayError } from './errors.js';
 
 function setUpSideBar() {
 
@@ -35,27 +36,13 @@ function setUpSideBar() {
 
 	var menu = contextmenu([
 		{
-			label: 'Rename',
-			onclick: function () {
-				lastContextEl = lastContextEl || directoryEl;
-				if (lastContextEl.stats) {
-					var newName = prompt('Rename file:', lastContextEl.stats.data.name);
-					if (newName) {
-						fs.rename(lastContextEl.stats.data.path, join(lastContextEl.stats.data.dirName, newName)).then(function () {
-							console.log('success');
-						});
-					}
-				}
-			}
-		},
-		{
 			label: 'New File',
 			onclick: function () {
 				lastContextEl = lastContextEl || directoryEl;
 				if (lastContextEl.stats) {
 					var newFile = prompt('New file name:', 'untitled.txt');
 					if (newFile) {
-						var newPath = join(lastContextEl.stats.data.dirName, newFile);
+						var newPath = join(lastContextEl.stats.isDirectory() ? lastContextEl.stats.data.path : lastContextEl.stats.data.dirName, newFile);
 						fs.writeFile(newPath, '', {
 							flag: 'wx'
 						})
@@ -64,6 +51,9 @@ function setUpSideBar() {
 						})
 						.then(function (stats) {
 							openFile(stats);	
+						})
+						.catch(function (e) {
+							displayError('FS Error', e.message, 3000);	
 						});
 					}
 				}
@@ -76,8 +66,28 @@ function setUpSideBar() {
 				if (lastContextEl.stats) {
 					var newFolder = prompt('New folder name:', 'New Folder');
 					if (newFolder) {
-						fs.mkdir(join(lastContextEl.stats.data.dirName, newFolder)).then(function () {
+						fs.mkdir(join(lastContextEl.stats.isDirectory() ? lastContextEl.stats.data.path : lastContextEl.stats.data.dirName, newFolder)).then(function () {
 							console.log('success');
+						})
+						.catch(function (e) {
+							displayError('FS Error', e.message, 3000);	
+						});
+					}
+				}
+			}
+		},
+		{
+			label: 'Rename',
+			onclick: function () {
+				lastContextEl = lastContextEl || directoryEl;
+				if (lastContextEl.stats) {
+					var newName = prompt('Rename file:', lastContextEl.stats.data.name);
+					if (newName) {
+						fs.rename(lastContextEl.stats.data.path, join(lastContextEl.stats.data.dirName, newName)).then(function () {
+							console.log('success');
+						})
+						.catch(function (e) {
+							displayError('FS Error', e.message, 3000);	
 						});
 					}
 				}
@@ -94,11 +104,17 @@ function setUpSideBar() {
 						if (lastContextEl.stats.isFile()) {
 							fs.unlink(path).then(function () {
 								console.log('success');
+							})
+							.catch(function (e) {
+								displayError('FS Error', e.message, 3000);	
 							});
 						}
 						if (lastContextEl.stats.isDirectory()) {
 							fs.rmdir(path).then(function () {
 								console.log('success');
+							})
+							.catch(function (e) {
+								displayError('FS Error', e.message, 3000);	
 							});
 						}
 					}

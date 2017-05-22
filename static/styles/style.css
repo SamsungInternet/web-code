@@ -115,6 +115,22 @@ main {
 	flex-direction: column;
 }
 
+#errors {
+	flex-grow: 0;
+	position: relative;
+	padding: 0;
+	margin: 0;
+}
+
+#errors > li {
+	background: palevioletred;
+	color: black;
+	list-style: none;
+	text-align: center;
+	display: block;
+	padding: 0.5em;
+}
+
 #file-dialog-widget {
 	min-width: 300px;
 	width: 66%;
