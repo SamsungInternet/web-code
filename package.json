@@ -8,7 +8,7 @@
     "web-code": "./index.js"
   },
   "scripts": {
-    "install": "napa tonsky/FiraCode",
+    "install": "echo 'Not in Termux, continuing...'; napa tonsky/FiraCode",
     "build": "rollup -c",
     "build-server": "rollup -c rollup-isomorphic.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -18,7 +18,9 @@
   "author": "Ada Rose Edwards",
   "license": "MIT",
   "dependencies": {
+    "axe-core": "^2.2.0",
     "body-parser": "^1.17.1",
+    "chokidar": "^1.7.0",
     "express": "^4.15.2",
     "file-icons": "git+https://github.com/file-icons/atom.git",
     "lockfile": "^1.0.3",
@@ -27,9 +29,8 @@
     "monaco": "^1.201704190613.0",
     "monaco-editor": "^0.8.3",
     "napa": "^2.3.0",
-    "ws": "^2.3.1",
-    "axe-core": "^2.2.0",
-    "pouchdb-browser": "^6.2.0"
+    "pouchdb-browser": "^6.2.0",
+    "ws": "^2.3.1"
   },
   "devDependencies": {
     "nodemon": "^1.11.0",
