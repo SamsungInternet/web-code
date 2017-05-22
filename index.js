@@ -90,19 +90,19 @@ lockFile.lock('web-code.lock', {}, function (err) {
 
 		ws.webCodeClient = new Client();
 		ws.webCodeClient.on('change', function fn(stats) {
-			ws.send(JSON.stringify(['FS_CHANGE', null, stats.toDoc()]), e => console.log(e));
+			ws.send(JSON.stringify(['FS_CHANGE', null, stats.toDoc()]), e => e && console.log(e));
 		});
 		ws.webCodeClient.on('add', function fn(stats) {
-			ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]), e => console.log(e));
+			ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]), e => e && console.log(e));
 		});
 		ws.webCodeClient.on('unlink', function fn(obj) {
-			ws.send(JSON.stringify(['FS_UNLINK', null, obj]), e => console.log(e));
+			ws.send(JSON.stringify(['FS_UNLINK', null, obj]), e => e && console.log(e));
 		});
 		ws.webCodeClient.on('addDir', function fn(stats) {
-			ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]), e => console.log(e));
+			ws.send(JSON.stringify(['FS_ADD', null, stats.toDoc()]), e => e && console.log(e));
 		});
 		ws.webCodeClient.on('unlinkDir', function fn(obj) {
-			ws.send(JSON.stringify(['FS_UNLINK', null, obj]), e => console.log(e));
+			ws.send(JSON.stringify(['FS_UNLINK', null, obj]), e => e && console.log(e));
 		});
 
 		ws.on('close', function close() {
