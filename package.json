@@ -34,7 +34,6 @@
     "ws": "^2.3.1"
   },
   "devDependencies": {
-    "dom-delegate": "^2.0.3",
     "nodemon": "^1.11.0",
     "rollup": "^0.41.6",
     "rollup-plugin-commonjs": "^8.0.2",
