@@ -12,7 +12,7 @@
     "build": "rollup -c",
     "build-server": "rollup -c rollup-isomorphic.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "./node_modules/.bin/nodemon --ignore static/scripts/bundle.js --ignore lib/web-code-stats.compiled.js --exec \"rm web-code.lock; npm run build; npm run build-server; DEBUG=1 npm run start\"",
+    "watch": "nodemon --ignore static/scripts/bundle.js --ignore lib/web-code-stats.compiled.js --exec \"rm web-code.lock; npm run build; npm run build-server; DEBUG=1 npm run start\"",
     "start": "node ./"
   },
   "author": "Ada Rose Edwards",
