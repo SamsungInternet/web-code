@@ -4,6 +4,7 @@
 
 var promises = new Map();
 import Stats from './web-code-stats.js';
+import { displayError, removeError } from './errors.js';
 import { dirname } from 'path';
 
 function remoteCmd(cmd, data) {
@@ -43,6 +44,7 @@ function updateEnv(name) {
 }
 
 var wsPromise = getNewWS();
+var errorMsg;
 
 // Connection opened
 function getNewWS() {
@@ -108,6 +110,11 @@ function getNewWS() {
 
 			console.log('Connected to the server...');
 
+			if (errorMsg) {
+				removeError(errorMsg);
+				errorMsg = null;
+			}
+
 			interval = setInterval(function ping() {
 				if (isAlive === false) {
 					terminate();
@@ -123,6 +130,7 @@ function getNewWS() {
 		function terminate() {
 			clearInterval(interval);
 			wsPromise = new Promise(function (resolve) {
+				if (!errorMsg) errorMsg = displayError('Connection', 'Lost server connection.');
 				setTimeout(function () {
 					console.log('Trying to get new connection');
 					getNewWS().then(function (newWs) {

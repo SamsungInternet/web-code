@@ -122,6 +122,15 @@ main {
 	margin: 0;
 }
 
+.error-type {
+	float: left;
+    background: #bf3b66;
+    margin: -0.5em 0 -0.5em -0.5em;
+    display: inline-block;
+    padding: 0.5em;
+    border-right: 1px solid #721c2d;
+}
+
 #errors > li {
 	background: palevioletred;
 	color: black;

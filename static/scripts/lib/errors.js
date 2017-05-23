@@ -23,8 +23,15 @@ function displayError(type, text, timeout) {
 	}
 
 	errorEl.appendChild(li);
+	return li;
+}
+
+function removeError(el) {
+	errorEl.removeChild(el);
 }
 
 export {
+	removeError,
 	displayError
 }
+
