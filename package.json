@@ -1,6 +1,6 @@
 {
   "name": "web-code",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Text editor for DeX and the Web based around Monaco",
   "main": "index.js",
   "preferGlobal": true,
