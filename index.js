@@ -52,6 +52,10 @@ lockFile.lock(lockfile, {}, function (err) {
 		maxAge: 3600 * 1000 * 24
 	}));
 
+	app.use(express.static(__dirname + '/node_modules/sw-toolbox', {
+		maxAge: 3600 * 1000 * 24
+	}));
+
 	app.use('/vs/', express.static(__dirname + '/node_modules/monaco-editor/min/vs', {
 		maxAge: 3600 * 1000 * 24
 	}));

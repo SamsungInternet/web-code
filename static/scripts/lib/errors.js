@@ -1,8 +1,9 @@
 /* eslint no-var: 0, no-console: 0 */
 
-var errorEl = document.getElementById('errors');
-
 function displayError(type, text, timeout) {
+
+	var errorEl = document.getElementById('errors');
+
 	var li = document.createElement('li');
 
 	var textEl = document.createElement('span');
@@ -27,6 +28,7 @@ function displayError(type, text, timeout) {
 }
 
 function removeError(el) {
+	var errorEl = document.getElementById('errors');
 	errorEl.removeChild(el);
 }
 
