@@ -29,7 +29,6 @@ wsPromise.then(function init(handshakeData) {
 		return smartOpen(handshakeData.path);
 	}
 
-
 	// load old state
 	return db.get('INIT_STATE')
 		.then(function (doc) {

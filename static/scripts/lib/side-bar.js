@@ -12,13 +12,19 @@ function setUpSideBar() {
 
 	function expandDir(el, stats) {
 		var filelistEl = el.querySelector('.filelist');
-		if (filelistEl.children.length) {
+		if (el.stats.expanded === true) {
+			el.stats.expanded = false;
 			destroyFileList(filelistEl);
 		} else {
+			el.stats.expanded = true;
 			populateFileList(filelistEl, stats.data.path, {
 				hideDotFiles: true
 			});
 		}
+	}
+
+	function refreshSideBar() {
+		directoryEl.stats.updateChildren();
 	}
 
 	var directoryEl = document.querySelector('#directory');
@@ -54,7 +60,8 @@ function setUpSideBar() {
 						})
 						.catch(function (e) {
 							displayError('FS Error', e.message, 3000);	
-						});
+						})
+						.then(refreshSideBar);
 					}
 				}
 			}
@@ -71,7 +78,8 @@ function setUpSideBar() {
 						})
 						.catch(function (e) {
 							displayError('FS Error', e.message, 3000);	
-						});
+						})
+						.then(refreshSideBar);
 					}
 				}
 			}
@@ -88,7 +96,8 @@ function setUpSideBar() {
 						})
 						.catch(function (e) {
 							displayError('FS Error', e.message, 3000);	
-						});
+						})
+						.then(refreshSideBar);
 					}
 				}
 			}
@@ -107,7 +116,8 @@ function setUpSideBar() {
 							})
 							.catch(function (e) {
 								displayError('FS Error', e.message, 3000);	
-							});
+							})
+							.then(refreshSideBar);
 						}
 						if (lastContextEl.stats.isDirectory()) {
 							fs.rmdir(path).then(function () {
@@ -115,7 +125,8 @@ function setUpSideBar() {
 							})
 							.catch(function (e) {
 								displayError('FS Error', e.message, 3000);	
-							});
+							})
+							.then(refreshSideBar);
 						}
 					}
 				}
