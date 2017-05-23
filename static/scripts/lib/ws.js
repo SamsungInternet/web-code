@@ -42,65 +42,98 @@ function updateEnv(name) {
 	});
 }
 
-	// Connection opened
-var wsPromise = new Promise(function (resolve) {
+var wsPromise = getNewWS();
 
-	if (isServer) resolve();
+// Connection opened
+function getNewWS() {
+	return new Promise(function (resolve) {
 
-	var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-	var ws = new WebSocket((isLocal ? 'ws://' : 'wss://') + location.host);
-	ws.binaryType = 'arraybuffer';
-	var handshakeResolver;
+		if (isServer) resolve();
 
-	ws.addEventListener('message', function m(e) {
-		if (typeof e.data === 'string') {
-			var result = JSON.parse(e.data);
-			var cmd = result[0];
-			var promiseResolver = promises.get(result[1]);
-			var data = result[2];
-			if (promiseResolver) {
-				promises.delete(result[1]);
-				return promiseResolver(data);
+		var interval = -1;
+		var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+		try {
+			var ws = new WebSocket((isLocal ? 'ws://' : 'wss://') + location.host);
+		} catch (e) {
+			return terminate();
+		}
+		ws.binaryType = 'arraybuffer';
+
+		var isAlive = true;
+
+		ws.addEventListener('message', function m(e) {
+			if (typeof e.data === 'string') {
+				if (e.data === '__pong__') {
+					isAlive = true;
+					return;
+				}
+				var result = JSON.parse(e.data);
+				var cmd = result[0];
+				var promiseResolver = promises.get(result[1]);
+				var data = result[2];
+				if (promiseResolver) {
+					promises.delete(result[1]);
+					return promiseResolver(data);
+				}
+				if (cmd === 'HANDSHAKE') {
+					resolve(
+						Promise.all([
+							updateEnv('HOME'),
+							updateEnv('DEBUG'),
+						])
+						.then(Promise.resolve(ws))
+					);
+				}
+				if (cmd === 'FS_CHANGE') {
+					console.log('CHANGE', data);
+				}
+				if (cmd === 'FS_ADD') {
+					Stats.fromPath(dirname(data.path)).then(function (stats) {
+						stats.updateChildren();
+					});
+					console.log('ADD', data);
+				}
+				if (cmd === 'FS_UNLINK') {
+					Stats.fromPath(dirname(data.path)).then(function (stats) {
+						stats.updateChildren();
+					});
+					console.log('UNLINK', data);
+				}
 			}
-			if (cmd === 'HANDSHAKE') {
-				handshakeResolver(data);
-			}
-			if (cmd === 'FS_CHANGE') {
-				console.log('CHANGE', data);
-			}
-			if (cmd === 'FS_ADD') {
-				Stats.fromPath(dirname(data.path)).then(function (stats) {
-					stats.updateChildren();
-				});
-				console.log('ADD', data);
-			}
-			if (cmd === 'FS_UNLINK') {
-				Stats.fromPath(dirname(data.path)).then(function (stats) {
-					stats.updateChildren();
-				});
-				console.log('UNLINK', data);
-			}
+		});
+
+		ws.addEventListener('close', terminate);
+
+		ws.addEventListener('open', function firstOpen() {
+
+			console.log('Connected to the server...');
+
+			interval = setInterval(function ping() {
+				if (isAlive === false) {
+					terminate();
+				}
+				isAlive = false;
+				ws.send('__ping__');
+			}, 3000);
+
+			ws.removeEventListener('open', firstOpen);
+			resolve(ws);
+		});
+
+		function terminate() {
+			clearInterval(interval);
+			wsPromise = new Promise(function (resolve) {
+				setTimeout(function () {
+					console.log('Trying to get new connection');
+					getNewWS().then(function (newWs) {
+						resolve(newWs);
+					});
+				}, 1000);
+			});
+			return wsPromise;
 		}
 	});
-
-	ws.addEventListener('open', function firstOpen() {
-		ws.removeEventListener('open', firstOpen);
-		resolve(ws);
-	});
-
-	return new Promise(function (resolve) {
-		handshakeResolver = resolve;
-	})
-	.then(function () {
-		return Promise.all([
-			updateEnv('HOME'),
-			updateEnv('DEBUG'),
-		]);
-	})
-	.then(function () {
-		return ws;	
-	});
-});
+}
 
 export {
 	wsPromise,

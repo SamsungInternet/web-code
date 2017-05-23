@@ -59,11 +59,11 @@ function renderFileList(el, array, options) {
 			li.textContent = stats.data.name;
 			li.stats = stats;
 
-			if (stats.expanded && stats.isDirectory() && useOptions.nested !== false) {
+			if (stats.isDirectory() && useOptions.nested !== false) {
 				var newFileList = document.createElement('ul');
 				newFileList.classList.add('filelist');
 				li.appendChild(newFileList);
-				if (stats.children) {
+				if (stats.expanded && stats.children) {
 					stats.renderFileList(newFileList, useOptions);
 				}
 			}
