@@ -8,7 +8,7 @@
     "web-code": "./index.js"
   },
   "scripts": {
-    "install": "termux-fix-shebang ./node_modules/* || echo 'Not in termux'; napa tonsky/FiraCode",
+    "install": "termux-fix-shebang $(npm bin -g)/* || echo 'Not in termux'; napa tonsky/FiraCode",
     "build": "rollup -c",
     "build-server": "rollup -c rollup-isomorphic.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
