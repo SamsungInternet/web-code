@@ -8,11 +8,12 @@
     "web-code": "./index.js"
   },
   "scripts": {
-    "install": "napa tonsky/FiraCode",
+    "install": "termux-fix-shebang ./node_modules/* || echo 'Not in termux'; napa tonsky/FiraCode",
     "build": "rollup -c",
     "build-server": "rollup -c rollup-isomorphic.config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "nodemon --ignore static/scripts/bundle.js --ignore lib/web-code-stats.compiled.js --exec \"rm web-code-3000.lock; npm run build; npm run build-server; DEBUG=1 npm run start\"",
+    "postinstall": "termux-fix-shebang ./index.js || echo 'Not in termux'",
     "start": "node ./"
   },
   "author": "Ada Rose Edwards",
