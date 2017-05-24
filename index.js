@@ -127,7 +127,6 @@ lockFile.lock(lockfile, {}, function (err) {
 		ws.on('close', function close() {
 			ws.webCodeClient.destroy();
 			ws.webCodeClient = null;
-			console.log('disconnected');
 		});
 
 		ws.isAlive = true;
