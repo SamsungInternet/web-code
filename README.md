@@ -7,32 +7,26 @@ A node based VSCode like editor. Made for Samsung DeX.
 In a Terminal (or Termux for Android)
 
 * Install node:
-
 ```
+apt get update
 apt get install nodejs
 ```
 
-* Update npm
-
-```
-npm install -g npm
-```
-
 * Install web-code
-
 ```
 npm install -g web-code
 ```
 
-* (DeX/Termux only) Fix Shebang
-```
-termux-fix-shebang `which web-code`
-```
-
 * Run web-code
 ```
-web-code
+web-code ./my-file.js
 ```
+
+# Using Web Code
+
+Web Code will only run a single instance of the server but will reuse this instance for opening additional files and folders.
+
+You can open as many files/folders as you like by running `web-code foo.txt` and it will use the existing process.
 
 # Development
 
