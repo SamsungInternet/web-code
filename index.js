@@ -14,7 +14,8 @@ const Client = require('./lib/client');
 const lockFile = require('lockfile');
 const fs = require('fs');
 const exec = require('child_process').exec;
-const execSync = require('child_process').execSync;
+const pathIsInside = require('path-is-inside');
+const Stats = require('./lib/web-code-stats.compiled');
 function puts(error, stdout, stderr) { console.log(stdout); console.log(stderr); }
 
 let lastWorkingDir = '';
@@ -28,22 +29,34 @@ lockFile.lock(lockfile, {}, function (err) {
 	if (err) {
 
 		const data = fs.readFileSync(lockfile, 'utf8').split('\n');
+		const storedDaemonPID = data[0];
+		let processIsRunning = true;
 
-		data[1] = lastWorkingDir;
-
-		if (lastWorkingDir) {
-			// Update the lockfile with new working dir, tell the daemon
-			fs.writeFileSync(lockfile, data.join('\n'));
-
-			// Daemon
-			execSync('kill -s 13 ' + data[0]);
-		} else {
-
-			// Process already exists so try to message to it.
-			console.log('Web-code daemon is already running, with pid:', data[0], '!');
+		try {
+			process.kill(storedDaemonPID, 0);
+		} catch (e) {
+			processIsRunning = false;
 		}
 
-		return;
+		// There is a daemon already running
+		if (processIsRunning) {
+
+			data[1] = lastWorkingDir;
+
+			if (lastWorkingDir) {
+				// Update the lockfile with new working dir, tell the daemon
+				fs.writeFileSync(lockfile, data.join('\n'));
+
+				// Daemon
+				process.kill(storedDaemonPID, 'SIGPIPE');
+			} else {
+
+				// Process already exists so try to message to it.
+				console.log('Web-code daemon is already running, with pid:', storedDaemonPID);
+			}
+
+			return;
+		}
 	}
 
 	fs.writeFileSync(lockfile, process.pid + '\n' + lastWorkingDir);
@@ -150,11 +163,24 @@ lockFile.lock(lockfile, {}, function (err) {
 
 	process.on('SIGPIPE', function() {
 		const data = fs.readFileSync(lockfile, 'utf8').split('\n');
-		lastWorkingDir = data[1];
+		const path = nodePath.resolve(data[1]);
+		const stats = fs.statSync(path);
+		const statsObj = Stats.fromNodeStats(path, stats).toDoc();
+
+		// If it is a file in an already open window then open it there
+		if (stats.isFile()) {
+			for (const ws of wss.clients) {
+				if (ws.editorState && ws.editorState.currentlyOpenedPath) {
+					if(pathIsInside(path, ws.editorState.currentlyOpenedPath)) {
+						ws.send(wsMessaging.wsSendFormat('OPEN_FILE', statsObj));
+						return;
+					}
+				}
+			}
+		}
 
 		// Opening a new browser tab to that location.
-		// STUB: Here we should see if the path is within an existing window
-		// in that case open it.
+		lastWorkingDir = path;
 		exec('termux-open-url http://127.0.0.1:' + server.address().port, puts);
 	});
 

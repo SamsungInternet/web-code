@@ -44,7 +44,7 @@ function destroyFileList(el) {
 function openPath(stats) {
 	if (stats.isDirectory()) {
 
-		if (state.currentlyOpenedPath !== stats.data.path) {
+		if (state.get('currentlyOpenedPath') !== stats.data.path) {
 			tabController.closeAll();
 
 			// Then open the saved tabs from last time
@@ -73,7 +73,8 @@ function openPath(stats) {
 			});
 		}
 
-		state.currentlyOpenedPath = stats.data.path;
+		state.set('currentlyOpenedPath', stats.data.path);
+		state.sync();
 
 		var filelist = document.getElementById('directory');
 		populateFileList(filelist, stats.data.path, {
@@ -160,7 +161,7 @@ function openFile(stats) {
 
 function promptForOpen() {
 	return fileDialog({
-		path: state.currentlyOpenedPath || process.env.HOME || '/',
+		path: state.get('currentlyOpenedPath') || process.env.HOME || '/',
 		role: 'open'
 	}).then(openPath);
 }
@@ -190,7 +191,7 @@ function saveTextFileFromEditor(stats, editor) {
 		});
 	} else if (stats.constructor === BufferFile) {
 		return fileDialog({
-			path: state.currentlyOpenedPath || process.env.HOME || '/',
+			path: state.get('currentlyOpenedPath') || process.env.HOME || '/',
 			role: 'save as',
 			filename: stats.data.name
 		}).then(function (path) {

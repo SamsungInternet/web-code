@@ -170,7 +170,7 @@ var tabController = (function setUpTabs() {
 	}
 
 	TabController.prototype.storeOpenTabs = function () {
-		if (!state.currentlyOpenedPath) return;
+		if (!state.get('currentlyOpenedPath')) return;
 		updateDBDoc('OPEN_TABS_FOR_' + state.currentlyOpenedPath, {
 			open_tabs: Array.from(this.currentlyOpenFilesMap.keys()).map(function (stats) {
 				return stats.toDoc();

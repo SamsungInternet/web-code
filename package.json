@@ -31,6 +31,7 @@
     "monaco": "^1.201704190613.0",
     "monaco-editor": "^0.8.3",
     "napa": "^2.3.0",
+    "path-is-inside": "^1.0.2",
     "pouchdb-browser": "^6.2.0",
     "sw-toolbox": "^3.6.0",
     "ws": "^2.3.1"

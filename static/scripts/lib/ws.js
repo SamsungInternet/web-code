@@ -6,6 +6,8 @@ var promises = new Map();
 import Stats from './web-code-stats.js';
 import { displayError, removeError } from './errors.js';
 import { dirname } from 'path';
+import state from './state.js';
+import { openFile } from './files.js';
 
 function remoteCmd(cmd, data) {
 	var id = performance.now() + '_' + Math.random();
@@ -101,6 +103,11 @@ function getNewWS() {
 					});
 					console.log('UNLINK', data);
 				}
+				if (cmd === 'OPEN_FILE') {
+					Stats.fromPath(data.path).then(function (stats) {
+						openFile(stats);
+					});
+				}
 			}
 		});
 
@@ -137,6 +144,11 @@ function getNewWS() {
 						resolve(newWs);
 					});
 				}, 1000);
+			}).then(function (newWs) {
+
+				// don't return sync otherwise recusrion
+				state.sync();	
+				return newWs;
 			});
 			return wsPromise;
 		}
