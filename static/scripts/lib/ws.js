@@ -7,11 +7,11 @@ import Stats from './web-code-stats.js';
 import { displayError, removeError } from './errors.js';
 import { dirname } from 'path';
 import state from './state.js';
-import { openFile } from './files.js';
+import { openFile, openPath } from './files.js';
 
-function remoteCmd(cmd, data) {
+function remoteCmd(cmd, data, ws) {
 	var id = performance.now() + '_' + Math.random();
-	return wsPromise.then(function (ws) {
+	return (ws ? Promise.resolve(ws) : wsPromise).then(function (ws) {
 		ws.send(JSON.stringify([
 			cmd,
 			id,
@@ -37,8 +37,8 @@ function remoteCmd(cmd, data) {
 	});
 }
 
-function updateEnv(name) {
-	return remoteCmd('GET_ENV', name)
+function updateEnv(name, ws) {
+	return remoteCmd('GET_ENV', name, ws)
 	.then(function (result) {
 		if (result) process.env[name] = result;
 		return result;
@@ -80,12 +80,17 @@ function getNewWS() {
 					return promiseResolver(data);
 				}
 				if (cmd === 'HANDSHAKE') {
+					Stats.fromPath(data.path).then(function (stats) {
+						openPath(stats);
+					});
 					resolve(
 						Promise.all([
-							updateEnv('HOME'),
-							updateEnv('DEBUG'),
+							updateEnv('HOME', ws),
+							updateEnv('DEBUG', ws),
 						])
-						.then(Promise.resolve(ws))
+						.then(function () {
+							return ws;
+						})
 					);
 				}
 				if (cmd === 'FS_CHANGE') {
@@ -115,8 +120,6 @@ function getNewWS() {
 
 		ws.addEventListener('open', function firstOpen() {
 
-			console.log('Connected to the server...');
-
 			if (errorMsg) {
 				removeError(errorMsg);
 				errorMsg = null;
@@ -131,7 +134,6 @@ function getNewWS() {
 			}, 3000);
 
 			ws.removeEventListener('open', firstOpen);
-			resolve(ws);
 		});
 
 		function terminate() {

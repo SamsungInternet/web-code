@@ -3,7 +3,11 @@
 /* eslint-env es6 */
 
 import PouchDB from 'pouchdb-browser';
-var db = isServer ? null : new PouchDB('web-code', {});
+try {
+	var db = isServer ? null : new PouchDB('web-code', {});
+} catch (e) {
+	console.log(e);
+}
 function updateDBDoc(_id, obj) {
 
 	updateDBDoc.promise = updateDBDoc.promise || Promise.resolve();

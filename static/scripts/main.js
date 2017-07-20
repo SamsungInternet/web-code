@@ -13,7 +13,9 @@ import Stats from './lib/web-code-stats.js';
 import fs from './lib/fs-proxy';
 window.fs = fs;
 
-wsPromise.then(function init(handshakeData) {
+wsPromise.then(function init() {
+	
+	console.log('Connected to the server...');
 
 	if (process.env.DEBUG) {
 		addScript('/axe/axe.min.js').promise.then(function () {
@@ -22,11 +24,6 @@ wsPromise.then(function init(handshakeData) {
 				console.log('a11y violations:', results.violations.length, results.violations);
 			});
 		});
-	}
-
-	// Open requested directory
-	if (handshakeData.path) {
-		return smartOpen(handshakeData.path);
 	}
 
 	// load old state
@@ -41,6 +38,8 @@ wsPromise.then(function init(handshakeData) {
 		.catch(function (err) {
 			console.log(err);
 		});
+}, function (e) {
+	console.log(e);	
 });
 
 (function setUpToolBar() {

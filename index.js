@@ -26,8 +26,10 @@ lastWorkingDir = path || false;
 const lockfile = require('path').join(__dirname, 'web-code-' + port + '.lock');
 lockFile.lock(lockfile, {}, function (err) {
 
+	// There is a lock file running
 	if (err) {
 
+		// Check if the stored pid matches the current one
 		const data = fs.readFileSync(lockfile, 'utf8').split('\n');
 		const storedDaemonPID = data[0];
 		let processIsRunning = true;
