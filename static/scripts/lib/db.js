@@ -21,9 +21,14 @@ function updateDBDoc(_id, obj) {
 			if (e.status === 404) {
 				return { _id: _id }
 			}
+			if (e.name === 'indexed_db_went_bad') {
+				console.log('Updating DB Failed: ' + e.reason);
+				return;
+			}
 			throw e;
 		})
 		.then(function (doc) {
+			if (!doc) return;
 			Object.keys(obj).forEach(function (key) {
 				doc[key] = obj[key];
 			});
