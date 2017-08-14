@@ -33,6 +33,7 @@ main {
 	display: flex;
 	flex-direction: row;
 	flex-grow: 1;
+	min-height: 0;
 }
 
 #container {
@@ -250,6 +251,7 @@ main {
 	display: flex;
 	flex-direction: row;
 	margin-bottom: 0.5em;
+	min-height: 0;
 }
 
 #file-dialog-widget .file-selectors .filelist:first-child {
@@ -281,6 +283,7 @@ main {
 .filelist .filelist {
 	padding-left: 0.5em;
 	border: none;
+	width: 100%;
 }
 
 .filelist li {

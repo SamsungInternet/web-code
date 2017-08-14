@@ -3,7 +3,11 @@
 /* eslint-env es6 */
 
 import PouchDB from 'pouchdb-browser';
-var db = isServer ? null : new PouchDB('web-code', {});
+try {
+	var db = isServer ? null : new PouchDB('web-code', {});
+} catch (e) {
+	console.log(e);
+}
 function updateDBDoc(_id, obj) {
 
 	updateDBDoc.promise = updateDBDoc.promise || Promise.resolve();
@@ -17,9 +21,14 @@ function updateDBDoc(_id, obj) {
 			if (e.status === 404) {
 				return { _id: _id }
 			}
+			if (e.name === 'indexed_db_went_bad') {
+				console.log('Updating DB Failed: ' + e.reason);
+				return;
+			}
 			throw e;
 		})
 		.then(function (doc) {
+			if (!doc) return;
 			Object.keys(obj).forEach(function (key) {
 				doc[key] = obj[key];
 			});

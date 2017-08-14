@@ -16,6 +16,13 @@ const fs = require('fs');
 const exec = require('child_process').exec;
 const pathIsInside = require('path-is-inside');
 const Stats = require('./lib/web-code-stats.compiled');
+const pathJoin = require('path').join;
+const pathDirname = require('path').dirname;
+
+function getModuleRoot(m) {
+	return pathDirname(require.resolve(m + '/package.json'));
+}
+
 function puts(error, stdout, stderr) { console.log(stdout); console.log(stderr); }
 
 let lastWorkingDir = '';
@@ -26,8 +33,10 @@ lastWorkingDir = path || false;
 const lockfile = require('path').join(__dirname, 'web-code-' + port + '.lock');
 lockFile.lock(lockfile, {}, function (err) {
 
+	// There is a lock file running
 	if (err) {
 
+		// Check if the stored pid matches the current one
 		const data = fs.readFileSync(lockfile, 'utf8').split('\n');
 		const storedDaemonPID = data[0];
 		let processIsRunning = true;
@@ -65,23 +74,23 @@ lockFile.lock(lockfile, {}, function (err) {
 		maxAge: 3600 * 1000 * 24
 	}));
 
-	app.use(express.static(__dirname + '/node_modules/sw-toolbox', {
+	app.use(express.static(getModuleRoot('sw-toolbox'), {
 		maxAge: 3600 * 1000 * 24
 	}));
 
-	app.use('/vs/', express.static(__dirname + '/node_modules/monaco-editor/min/vs', {
+	app.use('/vs/', express.static(pathJoin(getModuleRoot('monaco-editor'), '/min/vs'), {
 		maxAge: 3600 * 1000 * 24
 	}));
 
-	app.use('/icons/', express.static(__dirname + '/node_modules/file-icons/fonts', {
+	app.use('/icons/', express.static(pathJoin(getModuleRoot('file-icons'), '/fonts'), {
 		maxAge: 3600 * 1000 * 24
 	}));
 
-	app.use('/axe/', express.static(__dirname + '/node_modules/axe-core/', {
+	app.use('/axe/', express.static(getModuleRoot('axe-core'), {
 		maxAge: 3600 * 1000 * 24
 	}));
 
-	app.use('/contextmenu/', express.static(__dirname + '/node_modules/contextmenu/', {
+	app.use('/contextmenu/', express.static(getModuleRoot('contextmenu'), {
 		maxAge: 3600 * 1000 * 24
 	}));
 

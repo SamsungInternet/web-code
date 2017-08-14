@@ -9,23 +9,29 @@ import BufferFile from './buffer-file.js';
 // Until they are saved new files are kept in a buffer
 // Saved on changes to the db when saved to disk they are removed from the DB
 function newFile() {
+	var tab;
+
 	var bf = new BufferFile ({
 		name: 'New File',
 		icon: 'buffer',
 		id: Date.now() + '__' + 'New File'
 	});
-	var tab = tabController.newTab(bf);
-	Promise.all([monacoPromise, bf.valuePromise])
-		.then(function (arr) {
-			tab.editor = monaco.editor.create(tab.contentEl, monacoSettings({
-				value: arr[1]
-			}));
-			addBindings(tab.editor, tab);
-			tabController.focusTab(tab);
-		})
-		.catch(function (e) {
-			console.log(e.message);	
-		});
+	
+	bf.valuePromise
+	.then(function () {
+		tab = tabController.newTab(bf);
+		return monacoPromise;
+	})
+	.then(function (arr) {
+		tab.editor = monaco.editor.create(tab.contentEl, monacoSettings({
+			value: arr[1]
+		}));
+		addBindings(tab.editor, tab);
+		tabController.focusTab(tab);
+	})
+	.catch(function (e) {
+		console.log(e.message);	
+	});
 }
 
 
