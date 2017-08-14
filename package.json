@@ -23,7 +23,7 @@
     "body-parser": "^1.17.1",
     "chokidar": "^1.7.0",
     "contextmenu": "github:aantthony/contextmenu",
-    "express": "^4.15.2",
+    "express": "^4.15.4",
     "file-icons": "git+https://github.com/file-icons/atom.git",
     "lockfile": "^1.0.3",
     "lodash.debounce": "^4.0.8",
@@ -33,6 +33,7 @@
     "napa": "^2.3.0",
     "path-is-inside": "^1.0.2",
     "pouchdb-browser": "^6.2.0",
+    "rollup-plugin-commonjs": "^8.1.0",
     "sw-toolbox": "^3.6.0",
     "ws": "^2.3.1"
   },

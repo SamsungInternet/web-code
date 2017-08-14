@@ -1,0 +1,22 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/data/data/com.termux/files/usr/bin/node',
+1 verbose cli   '/data/data/com.termux/files/usr/bin/npm',
+1 verbose cli   'run',
+1 verbose cli   'tsc' ]
+2 info using npm@3.10.10
+3 info using node@v6.11.2
+4 verbose stack Error: missing script: tsc
+4 verbose stack     at run (/data/data/com.termux/files/usr/lib/node_modules/npm/lib/run-script.js:151:19)
+4 verbose stack     at /data/data/com.termux/files/usr/lib/node_modules/npm/lib/run-script.js:61:5
+4 verbose stack     at /data/data/com.termux/files/usr/lib/node_modules/npm/node_modules/read-package-json/read-json.js:356:5
+4 verbose stack     at handleExists (/data/data/com.termux/files/usr/lib/node_modules/npm/node_modules/read-package-json/read-json.js:329:20)
+4 verbose stack     at FSReqWrap.cb [as oncomplete] (fs.js:258:19)
+5 verbose cwd /data/data/com.termux/files/home/gitWorkingDir/web-code
+6 error Linux 4.4.13-11030127
+7 error argv "/data/data/com.termux/files/usr/bin/node" "/data/data/com.termux/files/usr/bin/npm" "run" "tsc"
+8 error node v6.11.2
+9 error npm  v3.10.10
+10 error missing script: tsc
+11 error If you need help, you may report this error at:
+11 error     <https://github.com/npm/npm/issues>
+12 verbose exit [ 1, true ]
