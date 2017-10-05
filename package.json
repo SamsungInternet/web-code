@@ -24,6 +24,7 @@
     "chokidar": "^1.7.0",
     "contextmenu": "github:aantthony/contextmenu",
     "express": "^4.15.4",
+    "express-fileupload": "^0.2.0",
     "file-icons": "git+https://github.com/file-icons/atom.git",
     "lockfile": "^1.0.3",
     "lodash.debounce": "^4.0.8",

@@ -19,7 +19,7 @@ function setUpSideBar() {
 			el.stats.expanded = true;
 			populateFileList(filelistEl, stats.data.path, {
 				hideDotFiles: true
-			});
+			});join(lastContextEl.stats.data.path)
 		}
 	}
 
@@ -56,10 +56,10 @@ function setUpSideBar() {
 							return Stats.fromPath(newPath)
 						})
 						.then(function (stats) {
-							openFile(stats);	
+							openFile(stats);
 						})
 						.catch(function (e) {
-							displayError('FS Error', e.message, 3000);	
+							displayError('FS Error', e.message, 3000);
 						})
 						.then(refreshSideBar);
 					}
@@ -77,7 +77,7 @@ function setUpSideBar() {
 							console.log('success');
 						})
 						.catch(function (e) {
-							displayError('FS Error', e.message, 3000);	
+							displayError('FS Error', e.message, 3000);
 						})
 						.then(refreshSideBar);
 					}
@@ -95,7 +95,7 @@ function setUpSideBar() {
 							console.log('success');
 						})
 						.catch(function (e) {
-							displayError('FS Error', e.message, 3000);	
+							displayError('FS Error', e.message, 3000);
 						})
 						.then(refreshSideBar);
 					}
@@ -115,7 +115,7 @@ function setUpSideBar() {
 								console.log('success');
 							})
 							.catch(function (e) {
-								displayError('FS Error', e.message, 3000);	
+								displayError('FS Error', e.message, 3000);
 							})
 							.then(refreshSideBar);
 						}
@@ -124,7 +124,7 @@ function setUpSideBar() {
 								console.log('success');
 							})
 							.catch(function (e) {
-								displayError('FS Error', e.message, 3000);	
+								displayError('FS Error', e.message, 3000);
 							})
 							.then(refreshSideBar);
 						}
@@ -132,11 +132,47 @@ function setUpSideBar() {
 				}
 			}
 		},
+		{
+			label: 'Upload Here',
+			onclick: function () {
+				var fileUpload = document.querySelector('input[name="uploadFile"]');
+
+				lastContextEl = lastContextEl || directoryEl;
+				let path;
+				if (lastContextEl && lastContextEl.stats) {
+						if (lastContextEl.stats.isFile()) {
+							path = lastContextEl.stats.data.dirName;
+						}
+						if (lastContextEl.stats.isDirectory()) {
+							path = lastContextEl.stats.data.path;
+						}
+				}
+
+				fileUpload.click();
+				fileUpload.addEventListener('change', function uploadFile() {
+					fileUpload.removeEventListener('change', uploadFile);
+
+					var data = new FormData()
+					lastContextEl = lastContextEl || directoryEl;
+					Array.from(fileUpload.files).forEach(function (file) {
+						data.append('uploadFile[]', file);
+					});
+					data.append('path', path)
+
+					fetch('/api/upload', {
+						method: 'POST',
+						body: data
+					})
+					.then(refreshSideBar);
+				}, false);
+			}
+		}
 	]);
 
 	var lastContextEl;
 
 	function updateContextMenuEl(el) {
+		lastContextEl = lastContextEl || directoryEl;
 		el = el || {};
 		if (el.stats) {
 			lastContextEl = el;
