@@ -118,7 +118,7 @@ function openFile(stats) {
 					newTab.contentEl.appendChild(image);
 					newTab.contentEl.classList.add('image-container');
 					return newTab;
-				} else if (stats.data.mime.match(/^video\//)) {
+				} else if (stats.data.extension !== '.ts' && stats.data.mime.match(/^video\//)) {
 					var video = document.createElement('video');
 					video.src = '/api/imageproxy?url=' + encodeURIComponent(stats.data.path);
 					newTab.contentEl.appendChild(video);
