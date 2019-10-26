@@ -25,6 +25,13 @@ function monacoSettings(inObj) {
 	return inObj;
 }
 
+function strHash(s) {
+	return s.split("").reduce(function(a, b) {
+       a = ((a << 5) - a) + b.charCodeAt(0);
+       return a & a
+     }, 0);
+}
+
 require.config({ paths: { 'vs': 'vs' } });
 
 var monacoPromise = new Promise(function (resolve) {
@@ -94,13 +101,15 @@ function addBindings(editor, tab) {
 	}, 'hasJustTabbedIn')
 
 	editor.webCodeState = {};
-		editor.webCodeState.hasChanges = false;
+	editor.webCodeState.textHash = strHash(editor.getValue())
 	editor.webCodeState.tab = tab;
 	editor.webCodeState.hasJustTabbedIn = editor.createContextKey('hasJustTabbedIn', false);
 
 	editor.webCodeState.functions = {
 		checkForChanges: function checkForChanges() {
 			editor.webCodeState.hasJustTabbedIn.set(false);
+			let hasChanges = editor.webCodeState.textHash !== strHash(editor.getValue())
+			editor.webCodeState.hasChanges = hasChanges;
 			tab.el.classList.toggle('has-changes', editor.webCodeState.hasChanges);
 		}
 	}
@@ -115,8 +124,6 @@ function addBindings(editor, tab) {
 
 	editor.onDidChangeModelContent(function () {
 		writeToDB();
-		console.log("hay cambios");
-		editor.webCodeState.hasChanges = true;
 		editor.webCodeState.functions.checkForChanges();
 	});
 
@@ -133,8 +140,7 @@ function addBindings(editor, tab) {
 		keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S],
 		keybindingContext: null,
 		run: function () {
-			console.log("ya no");
-			editor.webCodeState.hasChanges = false;
+			editor.webCodeState.textHash = strHash(editor.getValue())
 			saveTextFileFromEditor(tab.stats, editor);
 		}
 	});
