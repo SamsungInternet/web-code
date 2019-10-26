@@ -81,7 +81,7 @@ function openPath(stats) {
 			hideDotFiles: true
 		})
 		.catch(function (e) {
-			throw e;	
+			throw e;
 		});
 
 		updateDBDoc('INIT_STATE', {
@@ -99,8 +99,8 @@ function openPath(stats) {
 
 /**
  * returns a promise which resolves a Tab
- * 
- * @param {Stats|FileBuffer} stats 
+ *
+ * @param {Stats|FileBuffer} stats
  */
 function openFile(stats) {
 
@@ -139,7 +139,7 @@ function openFile(stats) {
 				}
 			})
 			.catch(function (e) {
-				console.log(e.message);	
+				console.log(e.message);
 			});
 
 		if (stats.constructor === BufferFile) {
@@ -183,7 +183,7 @@ function smartOpen(path) {
 // Saves file and updates versions for changes
 function saveTextFileFromEditor(stats, editor) {
 	if (stats.constructor === Stats) {
-		var altId = editor.model.getAlternativeVersionId();
+		var altId = editor.id;
 		return fs.writeFile(stats.data.path, editor.getValue())
 		.then(function () {
 			editor.webCodeState.savedAlternativeVersionId = altId;

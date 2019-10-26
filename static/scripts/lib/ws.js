@@ -17,7 +17,7 @@ function remoteCmd(cmd, data, ws) {
 			id,
 			data
 		]));
-		
+
 		if (process.env.DEBUG) {
 			var err = new Error();
 			var stack = err.stack;
@@ -149,7 +149,7 @@ function getNewWS() {
 			}).then(function (newWs) {
 
 				// don't return sync otherwise recusrion
-				state.sync();	
+				state.sync();
 				return newWs;
 			});
 			return wsPromise;

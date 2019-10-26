@@ -48,7 +48,7 @@ var monacoPromise = new Promise(function (resolve) {
 			{ token: 'constant.other.object.key.js', fontStyle: 'italic' },
 			{ token: 'string.unquoted.label.js', fontStyle: 'italic' },
 		]
-	});	
+	});
 });
 
 function getMonacoLanguageFromMimes(mime) {
@@ -94,14 +94,14 @@ function addBindings(editor, tab) {
 	}, 'hasJustTabbedIn')
 
 	editor.webCodeState = {};
-	editor.webCodeState.savedAlternativeVersionId = editor.model.getAlternativeVersionId();
+	editor.webCodeState.savedAlternativeVersionId = editor.id;
 	editor.webCodeState.tab = tab;
 	editor.webCodeState.hasJustTabbedIn = editor.createContextKey('hasJustTabbedIn', false);
 
 	editor.webCodeState.functions = {
 		checkForChanges: function checkForChanges() {
 			editor.webCodeState.hasJustTabbedIn.set(false);
-			var hasChanges = editor.webCodeState.savedAlternativeVersionId !== editor.model.getAlternativeVersionId();
+			var hasChanges = editor.webCodeState.savedAlternativeVersionId !== editor.id;
 			editor.webCodeState.hasChanges = hasChanges;
 			tab.el.classList.toggle('has-changes', hasChanges);
 		}
@@ -110,7 +110,7 @@ function addBindings(editor, tab) {
 	var writeToDB = debounce(function writeToDB() {
 		if (tab.stats.constructor === BufferFile) {
 			tab.stats.update(editor.getValue()).then(function () {
-				editor.webCodeState.savedAlternativeVersionId = editor.model.getAlternativeVersionId();
+				editor.webCodeState.savedAlternativeVersionId = editor.id;
 				editor.webCodeState.functions.checkForChanges();
 			});
 		}
@@ -121,7 +121,7 @@ function addBindings(editor, tab) {
 		editor.webCodeState.functions.checkForChanges();
 	});
 
-	editor.onDidFocusEditor(function () {
+	editor.onDidFocusEditorText(function () {
 		editor.webCodeState.hasJustTabbedIn.set(true);
 	});
 	editor.onMouseDown(function () {
