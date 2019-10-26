@@ -94,23 +94,20 @@ function addBindings(editor, tab) {
 	}, 'hasJustTabbedIn')
 
 	editor.webCodeState = {};
-	editor.webCodeState.savedAlternativeVersionId = editor.id;
+		editor.webCodeState.hasChanges = false;
 	editor.webCodeState.tab = tab;
 	editor.webCodeState.hasJustTabbedIn = editor.createContextKey('hasJustTabbedIn', false);
 
 	editor.webCodeState.functions = {
 		checkForChanges: function checkForChanges() {
 			editor.webCodeState.hasJustTabbedIn.set(false);
-			var hasChanges = editor.webCodeState.savedAlternativeVersionId !== editor.id;
-			editor.webCodeState.hasChanges = hasChanges;
-			tab.el.classList.toggle('has-changes', hasChanges);
+			tab.el.classList.toggle('has-changes', editor.webCodeState.hasChanges);
 		}
 	}
 
 	var writeToDB = debounce(function writeToDB() {
 		if (tab.stats.constructor === BufferFile) {
 			tab.stats.update(editor.getValue()).then(function () {
-				editor.webCodeState.savedAlternativeVersionId = editor.id;
 				editor.webCodeState.functions.checkForChanges();
 			});
 		}
@@ -118,6 +115,8 @@ function addBindings(editor, tab) {
 
 	editor.onDidChangeModelContent(function () {
 		writeToDB();
+		console.log("hay cambios");
+		editor.webCodeState.hasChanges = true;
 		editor.webCodeState.functions.checkForChanges();
 	});
 
@@ -134,6 +133,8 @@ function addBindings(editor, tab) {
 		keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S],
 		keybindingContext: null,
 		run: function () {
+			console.log("ya no");
+			editor.webCodeState.hasChanges = false;
 			saveTextFileFromEditor(tab.stats, editor);
 		}
 	});
