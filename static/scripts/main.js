@@ -14,7 +14,7 @@ import fs from './lib/fs-proxy';
 window.fs = fs;
 
 wsPromise.then(function init() {
-	
+
 	console.log('Connected to the server...');
 
 	if (process.env.DEBUG) {
@@ -39,7 +39,7 @@ wsPromise.then(function init() {
 			console.log(err);
 		});
 }, function (e) {
-	console.log(e);	
+	console.log(e);
 });
 
 (function setUpToolBar() {

@@ -154,7 +154,7 @@ function setUpSideBar() {
 	  	sidebar.style.width = "0px"
 		else{
 			sidebar.style.width = "200px"
-			document.querySelector('#editor').style.width = String(window.innerWidth -200)+"px"
+			document.querySelector('#container div').style.width = String(window.innerWidth -200)+"px"
 		}
 		var event = new Event('resize')
 		window.dispatchEvent(event);
