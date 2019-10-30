@@ -22,10 +22,8 @@ function newFile() {
 		tab = tabController.newTab(bf);
 		return monacoPromise;
 	})
-	.then(function (arr) {
-		tab.editor = monaco.editor.create(tab.contentEl, monacoSettings({
-			value: arr[1]
-		}));
+	.then(function () {
+		tab.editor = monaco.editor.create(tab.contentEl, monacoSettings());
 		addBindings(tab.editor, tab);
 		tabController.focusTab(tab);
 	})
