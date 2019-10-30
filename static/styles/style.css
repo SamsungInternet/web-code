@@ -85,6 +85,11 @@ main {
 	min-height: 5em;
 }
 
+#close-sidebar {
+	writing-mode: vertical-rl;
+	border: 0px
+}
+
 .tab-content {
 	flex-grow: 1;
 	display: none;

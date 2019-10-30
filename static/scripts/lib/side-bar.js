@@ -56,10 +56,10 @@ function setUpSideBar() {
 							return Stats.fromPath(newPath)
 						})
 						.then(function (stats) {
-							openFile(stats);	
+							openFile(stats);
 						})
 						.catch(function (e) {
-							displayError('FS Error', e.message, 3000);	
+							displayError('FS Error', e.message, 3000);
 						})
 						.then(refreshSideBar);
 					}
@@ -77,7 +77,7 @@ function setUpSideBar() {
 							console.log('success');
 						})
 						.catch(function (e) {
-							displayError('FS Error', e.message, 3000);	
+							displayError('FS Error', e.message, 3000);
 						})
 						.then(refreshSideBar);
 					}
@@ -95,7 +95,7 @@ function setUpSideBar() {
 							console.log('success');
 						})
 						.catch(function (e) {
-							displayError('FS Error', e.message, 3000);	
+							displayError('FS Error', e.message, 3000);
 						})
 						.then(refreshSideBar);
 					}
@@ -115,7 +115,7 @@ function setUpSideBar() {
 								console.log('success');
 							})
 							.catch(function (e) {
-								displayError('FS Error', e.message, 3000);	
+								displayError('FS Error', e.message, 3000);
 							})
 							.then(refreshSideBar);
 						}
@@ -124,7 +124,7 @@ function setUpSideBar() {
 								console.log('success');
 							})
 							.catch(function (e) {
-								displayError('FS Error', e.message, 3000);	
+								displayError('FS Error', e.message, 3000);
 							})
 							.then(refreshSideBar);
 						}
@@ -146,6 +146,19 @@ function setUpSideBar() {
 			menuTitle.textContent = '';
 		}
 	}
+
+	document.querySelector('button[data-action="close-sidebar"]')
+		.addEventListener('click', function() {
+		sidebar = document.querySelector('#sidebar')
+		if(sidebar.style.width != "0px")
+	  	sidebar.style.width = "0px"
+		else{
+			sidebar.style.width = "200px"
+			document.querySelector('#editor').style.width = String(window.innerWidth -200)+"px"
+		}
+		var event = new Event('resize')
+		window.dispatchEvent(event);
+	});
 
 	directoryEl.addEventListener('contextmenu', function (e) {
 		updateContextMenuEl(e.target);
