@@ -1,3 +1,8 @@
+# Deprecated
+
+I've recently started using [cdr/code-server](https://github.com/cdr/code-server) which is a full VS Code instance which now
+runs on Android. The same way this does.
+
 # Web Code
 
 A node based VSCode like editor. Made for Samsung DeX.
